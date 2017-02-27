@@ -24,7 +24,7 @@ public class TcpPacketParser {
     private long byteArrayToUnsignedInt(byte[] b) {
         return ((b[0] << 24 | b[1] << 16 | b[2] << 8 | b[3]) & 0xffffffff);
     }
-    
+
     public TcpPacketParser(byte[] tcpPacketArray){
         byte[] subArr;
         subArr = Arrays.copyOfRange(tcpPacketArray,0,2);
