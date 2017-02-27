@@ -1,5 +1,6 @@
 package fcn_hw2;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -16,30 +17,40 @@ public class TcpPacketParser {
     private int flags;
     private int  temp;
 
-    private int byteArrayToUnsignedShort(byte[] b) {
-        return (((b[0] << 8) & 0xff00) | b[1] & 0xff);
+    public static int byteArrayToInt(byte [] b) {
+        StringBuilder sb = new StringBuilder(2* b.length);
+        for(byte elem: b) {
+            sb.append(String.format("%02x",elem));
+        }
+
+        BigInteger val = new BigInteger(sb.toString(),16);
+        return val.intValue();
     }
 
-    private long byteArrayToUnsignedInt(byte[] b) {
-        return ((b[0] << 24) & 0xff000000 | (b[1] << 16) & 0xff0000 |
-                (b[2] << 8) & 0xff00 | b[3] & 0xff);
+    public static long byteArrayToLong(byte [] b) {
+        StringBuilder sb = new StringBuilder(2* b.length);
+        for(byte elem: b) {
+            sb.append(String.format("%02x",elem));
+        }
+
+        BigInteger val = new BigInteger(sb.toString(),16);
+        return val.longValue();
     }
 
     public TcpPacketParser(byte[] tcpPacketArray){
         byte[] subArr;
         subArr = Arrays.copyOfRange(tcpPacketArray,0,2);
-        System.out.printf("%02X\n",subArr[0]);
-        System.out.printf("%02X\n",subArr[1]);
-        this.sourcePort = byteArrayToUnsignedShort(subArr);
+
+        this.sourcePort = byteArrayToInt(subArr);
 
         subArr = Arrays.copyOfRange(tcpPacketArray,2,4);
-        this.destinationPort = byteArrayToUnsignedShort(subArr);
+        this.destinationPort = byteArrayToInt(subArr);
 
         subArr = Arrays.copyOfRange(tcpPacketArray,4,8);
-        this.seqNo = byteArrayToUnsignedInt(subArr);
+        this.seqNo = byteArrayToLong(subArr);
 
         subArr = Arrays.copyOfRange(tcpPacketArray,8,12);
-        this.ackNo = byteArrayToUnsignedInt(subArr);
+        this.ackNo = byteArrayToLong(subArr);
         this.flags = tcpPacketArray[0];
     }
 
@@ -48,8 +59,8 @@ public class TcpPacketParser {
         System.out.println("////////////////////////////////");
         System.out.println("Source:" + sourcePort);
         System.out.println("Destination: " + destinationPort);
-        System.out.println("Seqno: " + seqNo);
+        System.out.println("SeqNo: " + seqNo);
         System.out.println("Ack: " + ackNo);
-        System.out.println("////////////////////////////////");
+//        System.out.println("////////////////////////////////");
     }
 }
