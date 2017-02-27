@@ -48,7 +48,7 @@ public class ClassicPcapExample {
         }  
   
         /* 
-         * We have an opened the capture file now time to read packets. We use a 
+         * We eave an opened the capture file now time to read packets. We use a 
          * Pcap.loop function to retrieve 10 packets from the file. We supply an 
          * annonymous handler which will receive packets as they are read from the 
          * offline file by libpcap. We parameterize it with a StringBuilder class. 
