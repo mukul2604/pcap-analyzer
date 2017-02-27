@@ -6,9 +6,10 @@ import org.jnetpcap.nio.JBuffer;
 import org.jnetpcap.nio.JMemory;
 import org.jnetpcap.packet.JRegistry;
 import org.jnetpcap.packet.PcapPacket;
-import org.jnetpcap.packet.format.FormatUtils;
+
 import org.jnetpcap.protocol.lan.Ethernet;
 import org.jnetpcap.protocol.network.Ip4;
+import org.jnetpcap.protocol.tcpip.Tcp;
 
 import java.nio.ByteBuffer;
 
@@ -54,8 +55,7 @@ public class NextExExample {
          * Second - we create our main loop and our application We create some
          * objects we will be using and reusing inside the loop
          **************************************************************************/
-        Ip4 ip = new Ip4();
-        Ethernet eth = new Ethernet();
+        Tcp tcp = new Tcp();
         PcapHeader hdr = new PcapHeader(JMemory.POINTER);
         JBuffer buf = new JBuffer(JMemory.POINTER);
 
@@ -75,27 +75,25 @@ public class NextExExample {
              * Fifth - we copy header and buffer data to new packet object
              ************************************************************************/
             PcapPacket packet = new PcapPacket(hdr, buf);
-            ByteBuffer packetBuffer = ByteBuffer.allocate(packet.size());
-            packet.transferTo(packetBuffer);
+
 
             /*************************************************************************
              * Six- we scan the new packet to discover what headers it contains
              ************************************************************************/
             packet.scan(id);
-            System.out.println(packetBuffer);
 
-			/*
-			 * We use FormatUtils (found in org.jnetpcap.packet.format package), to
-			 * convert our raw addresses to a human readable string.
-			 */
-//            if (packet.hasHeader(eth)) {
-//                String str = FormatUtils.mac(eth.source());
-//                System.out.printf("#%d: eth.src=%s\n", packet.getFrameNumber(), str);
-//            }
-//            if (packet.hasHeader(ip)) {
-//                String str = FormatUtils.ip(ip.source());
-//                System.out.printf("#%d: ip.src=%s\n", packet.getFrameNumber(), str);
-//            }
+            if (packet.hasHeader(tcp)) {
+                packet.getHeader(tcp);
+                ByteBuffer packetBuffer = ByteBuffer.allocate(tcp.size());
+                tcp.transferTo(packetBuffer);
+                byte[] byteArr = packetBuffer.array();
+                System.out.println(byteArr);
+//                for (byte b: byteArr) {
+//                    System.out.println("%d", b);
+//                }
+                /* System.out.println("ds\n"); */
+            }
+
         }
 
         /*************************************************************************
