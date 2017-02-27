@@ -1,20 +1,22 @@
 package fcn_hw2;
-import java.util.HashMap;  
-import java.util.List;  
-import java.util.Map;  
+//import java.util.HashMap;  
+//import java.util.List;  
+//import java.util.Map;  
   
 import org.jnetpcap.Pcap;  
-import org.jnetpcap.nio.JMemory;  
-import org.jnetpcap.packet.JFlow;  
-import org.jnetpcap.packet.JFlowKey;  
-import org.jnetpcap.packet.JFlowMap;  
+//import org.jnetpcap.nio.JMemory;  
+//import org.jnetpcap.packet.JFlow;  
+//import org.jnetpcap.packet.JFlowKey;  
+//import org.jnetpcap.packet.JFlowMap;  
 import org.jnetpcap.packet.JPacket;  
 import org.jnetpcap.packet.JPacketHandler;  
-import org.jnetpcap.packet.JScanner;  
-import org.jnetpcap.packet.PcapPacket;  
+//import org.jnetpcap.packet.JScanner;  
+//import org.jnetpcap.packet.PcapPacket;  
 import org.jnetpcap.protocol.tcpip.Http;  
-import org.jnetpcap.protocol.tcpip.Tcp;  
-  
+import org.jnetpcap.protocol.tcpip.Tcp;
+
+import java.nio.ByteBuffer;
+
 /** 
  * This example demonstrates various usage scenerios for jNetPcap API. The test 
  * file used in this example can be found under the "tests" directory located 
@@ -59,7 +61,7 @@ public class ClassicPcapExample {
          * object directly from the enclosing main method as that local variable is 
          * marked final allowing anonymous classes access to it. 
          */  
-        pcap.loop(100, new JPacketHandler<StringBuilder>() {  
+        pcap.loop(1, new JPacketHandler<StringBuilder>() {
   
             /** 
              * We purposely define and allocate our working tcp header (accessor) 
@@ -103,13 +105,20 @@ public class ClassicPcapExample {
                     /* 
                      * Now get our tcp header definition (accessor) peered with actual 
                      * memory that holds the tcp header within the packet. 
-                     */  
-                    packet.getHeader(tcp);  
-  
+                     */
+
+                    //byte x = new byte(100);
+
+                    packet.getHeader(tcp);
+                    ByteBuffer x = ByteBuffer.allocate(tcp.size());
+                    tcp.transferTo(x);
+                    //tcp.transferTo(x);
                     System.out.printf("tcp.dst_port=%d%n", tcp.destination());  
                     System.out.printf("tcp.src_port=%d%n", tcp.source());  
-                    System.out.printf("tcp.ack=%x%n", tcp.ack());  
-  
+                    System.out.printf("tcp.ack=%x%n", tcp.ack());
+                    System.out.printf("tcp.seqno=%d%n", tcp.seq());
+                    System.out.printf("tcp.seqno=%d%n", tcp.size());
+
                 }  
   
                 /* 
