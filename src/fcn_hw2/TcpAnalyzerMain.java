@@ -10,7 +10,8 @@ import org.jnetpcap.protocol.tcpip.Tcp;
 import java.nio.ByteBuffer;
 
 
-public class Tcp_Analyzer {
+
+public class TcpAnalyzerMain {
 
      public static void main(String[] args) {
         final String FILE_NAME = "/home/cloudera/assignment2.pcap";
@@ -39,18 +40,18 @@ public class Tcp_Analyzer {
             packet.scan(id);
 
             if (packet.hasHeader(tcp)) {
+                /* This is full packet hdr + buf */
                 packet.getHeader(tcp);
                 ByteBuffer packetBuffer = ByteBuffer.allocate(tcp.size());
                 tcp.transferTo(packetBuffer);
                 byte[] byteArr = packetBuffer.array();
-                System.out.println(byteArr);
+//                System.out.println(byteArr);
+                TcpPacketParser tcpPacketParser = new TcpPacketParser(byteArr);
+                tcpPacketParser.printPacket();
             }
 
         }
 
-        /*************************************************************************
-         * Last thing to do is close the pcap handle
-         ************************************************************************/
         pcap.close();
     }
 }
