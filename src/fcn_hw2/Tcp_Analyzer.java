@@ -10,7 +10,7 @@ import org.jnetpcap.protocol.tcpip.Tcp;
 import java.nio.ByteBuffer;
 
 
-public class Tcp_Analyser {
+public class Tcp_Analyzer {
 
      public static void main(String[] args) {
         final String FILE_NAME = "/home/cloudera/assignment2.pcap";
