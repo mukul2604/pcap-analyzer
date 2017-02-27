@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
 public class TcpAnalyzerMain {
 
      public static void main(String[] args) {
-        final String FILE_NAME = "/home/cloudera/assignment2.pcap";
+        final String FILE_NAME = "/home/cloudera/workspace/fcn_hw2/src/fcn_hw2/assignment2.pcap";
         StringBuilder errbuf = new StringBuilder(); // For any error msgs
 
         Pcap pcap = Pcap.openOffline(FILE_NAME, errbuf);
@@ -45,7 +45,6 @@ public class TcpAnalyzerMain {
                 ByteBuffer packetBuffer = ByteBuffer.allocate(tcp.size());
                 tcp.transferTo(packetBuffer);
                 byte[] byteArr = packetBuffer.array();
-//                System.out.println(byteArr);
                 TcpPacketParser tcpPacketParser = new TcpPacketParser(byteArr);
                 tcpPacketParser.printPacket();
             }
