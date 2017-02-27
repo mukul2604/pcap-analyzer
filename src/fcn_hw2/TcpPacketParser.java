@@ -17,17 +17,19 @@ public class TcpPacketParser {
     private int  temp;
 
     private int byteArrayToUnsignedShort(byte[] b) {
-        return ((b[0] << 8 | b[1]) & 0xffff);
-
+        return (((b[0] << 8) & 0xff00) | b[1] & 0xff);
     }
 
     private long byteArrayToUnsignedInt(byte[] b) {
-        return ((b[0] << 24 | b[1] << 16 | b[2] << 8 | b[3]) & 0xffffffff);
+        return ((b[0] << 24) & 0xff000000 | (b[1] << 16) & 0xff0000 |
+                (b[2] << 8) & 0xff00 | b[3] & 0xff);
     }
 
     public TcpPacketParser(byte[] tcpPacketArray){
         byte[] subArr;
         subArr = Arrays.copyOfRange(tcpPacketArray,0,2);
+        System.out.printf("%02X\n",subArr[0]);
+        System.out.printf("%02X\n",subArr[1]);
         this.sourcePort = byteArrayToUnsignedShort(subArr);
 
         subArr = Arrays.copyOfRange(tcpPacketArray,2,4);
