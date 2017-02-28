@@ -48,6 +48,7 @@ public class TcpAnalyzerMain {
                 byte[] byteArr = packetBuffer.array();
                 TcpPacketParser tcpPacketParser = new TcpPacketParser(byteArr);
                 tcpPacketParser.printPacket();
+               // System.out.println(tcpPacketParser.ackNo());
             }
 
         }
