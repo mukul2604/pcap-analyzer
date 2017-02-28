@@ -1,8 +1,6 @@
 package fcn_hw2;
 
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Arrays;
 
 /**
@@ -14,8 +12,8 @@ public class TcpPacketParser {
     private int destinationPort;
     private long seqNo;
     private long ackNo;
-    private int flags;
-    private int  temp;
+    private short flags;
+    private int windowSize;
 
     public static int byteArrayToInt(byte [] b) {
         StringBuilder sb = new StringBuilder(2* b.length);
@@ -37,6 +35,13 @@ public class TcpPacketParser {
         return val.longValue();
     }
 
+    private short extractFlags(byte[] b) {
+        short _8bits = b[1];
+        short _1bit = (short) ((b[0] & 0x1) << 8);
+
+        return (short) (_1bit | _8bits);
+    }
+
     public TcpPacketParser(byte[] tcpPacketArray){
         byte[] subArr;
         subArr = Arrays.copyOfRange(tcpPacketArray,0,2);
@@ -51,7 +56,12 @@ public class TcpPacketParser {
 
         subArr = Arrays.copyOfRange(tcpPacketArray,8,12);
         this.ackNo = byteArrayToLong(subArr);
-        this.flags = tcpPacketArray[0];
+
+        subArr = Arrays.copyOfRange(tcpPacketArray, 12,14);
+        this.flags = extractFlags(subArr);
+
+        subArr = Arrays.copyOfRange(tcpPacketArray, 14, 16);
+        this.windowSize = byteArrayToInt(subArr);
     }
 
 
@@ -61,6 +71,7 @@ public class TcpPacketParser {
         System.out.println("Destination: " + destinationPort);
         System.out.println("SeqNo: " + seqNo);
         System.out.println("Ack: " + ackNo);
-//        System.out.println("////////////////////////////////");
+        System.out.println("Flags: " + flags);
+        System.out.println("Window Size: " + windowSize);
     }
 }
