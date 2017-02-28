@@ -12,16 +12,17 @@ import java.nio.ByteBuffer;
 
 
 public class TcpAnalyzerMain {
+    private static int tcpCount = 0;
 
-     public static void main(String[] args) {
+    public static void main(String[] args) {
         final String FILE_NAME = "/home/cloudera/workspace/fcn_hw2/src/fcn_hw2/assignment2.pcap";
-        StringBuilder errbuf = new StringBuilder(); // For any error msgs
+        StringBuilder errBuf = new StringBuilder(); // For any error msgs
 
-        Pcap pcap = Pcap.openOffline(FILE_NAME, errbuf);
+        Pcap pcap = Pcap.openOffline(FILE_NAME, errBuf);
 
         if (pcap == null) {
             System.err.printf("Error while opening file for capture: "
-                    + errbuf.toString());
+                    + errBuf.toString());
             return;
         }
 
@@ -40,18 +41,17 @@ public class TcpAnalyzerMain {
             packet.scan(id);
 
             if (packet.hasHeader(tcp)) {
-                /* This is full packet hdr + buf */
+                tcpCount++;
                 packet.getHeader(tcp);
                 ByteBuffer packetBuffer = ByteBuffer.allocate(tcp.size());
                 tcp.transferTo(packetBuffer);
                 byte[] byteArr = packetBuffer.array();
                 TcpPacketParser tcpPacketParser = new TcpPacketParser(byteArr);
                 tcpPacketParser.printPacket();
-//                break;
             }
 
         }
-
+        System.out.printf("Number of tcp Packets:%d\n", tcpCount);
         pcap.close();
     }
 }

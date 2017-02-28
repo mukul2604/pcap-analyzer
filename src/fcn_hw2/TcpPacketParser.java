@@ -66,12 +66,7 @@ public class TcpPacketParser {
 
 
     public void printPacket() {
-        System.out.println("////////////////////////////////");
-        System.out.println("Source:" + sourcePort);
-        System.out.println("Destination: " + destinationPort);
-        System.out.println("SeqNo: " + seqNo);
-        System.out.println("Ack: " + ackNo);
-        System.out.println("Flags: " + flags);
-        System.out.println("Window Size: " + windowSize);
+        System.out.printf("Source: %5d\tDestination: %5d\tSeqNo: %12d\tAck: %12d\tFlags: %d\tWindow Size: %d\n",
+                        sourcePort, destinationPort, seqNo, ackNo, flags, windowSize);
     }
 }
