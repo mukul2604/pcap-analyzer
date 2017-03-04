@@ -9,9 +9,6 @@ import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import java.nio.ByteBuffer;
 
-
-
-
 public class TcpAnalyzerMain {
     private static int tcpCount = 0;
     public static final int SYN = 0x002;
