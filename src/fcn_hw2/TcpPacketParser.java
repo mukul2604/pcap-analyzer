@@ -72,15 +72,15 @@ public class TcpPacketParser {
         this.windowSize = byteArrayToInt(subArr);
 
         if ((flags & SYN) == SYN && (flags & ACK) != ACK) {
-            long a =  sourcePort*27 + destinationPort + seqNo;
+            int a = sourcePort*27 + destinationPort;
             flowHash.put(a, flags);
         }
 
         if ((flags & SYN) == SYN && (flags & ACK) == ACK) {
-            long a = destinationPort + sourcePort * 27 + seqNo;
+            int  a = destinationPort + sourcePort * 27;
             flowHash.put(a, flags);
         }
-        System.out.println(flowHash.size());
+        //System.out.println(flowHash.size());
     }
 
 

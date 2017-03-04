@@ -14,17 +14,15 @@ public class TcpAnalyzerMain {
     private static int tcpCount = 0;
     public static final int SYN = 0x002;
     public static final int ACK = 0x010;
-    public static HashMap<Long, Integer> flowHash = new HashMap<>();
+    public static HashMap<Integer, Integer> flowHash = new HashMap<>();
 
-     public static int flowCount() {
+     public  static int flowCount() {
         int count = 0;
-      //  System.out.println(flowHash.size());
-        for(Long key: flowHash.keySet()) {
-          //  System.out.println(flowHash.get(key));
-            if ((flowHash.get(key) & SYN) == SYN && (flowHash.get(key) & ACK) == ACK) {
+        for(Integer key: flowHash.keySet()) {
+            if ((flowHash.get(key) & SYN) == SYN && (flowHash.get(key) & ACK) != ACK) {
 //                Key temp;
 //                temp = new Key<>(new Object[]{key.t[1], key.t[0]});
-//                if ((flowHash.get(temp) & SYN) == SYN && (flowHash.get(key) & ACK) != ACK) {
+//                if ((flowHash.get(temp) & SYN) == SYN && (flowHash.get(key) & ACK) == ACK) {
                     count++;
 //                }
 
@@ -66,7 +64,7 @@ public class TcpAnalyzerMain {
             }
 
         }
-        System.out.println("Flow Count: " + flowCount());
+        System.out.println(flowCount());
         System.out.printf("Number of tcp Packets:%d\n", tcpCount);
         pcap.close();
     }
