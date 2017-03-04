@@ -95,6 +95,7 @@ public class TcpPacketParser {
                 int state = flowHash.get(a);
                 if (state == (SYN|ACK)) {
                     state = ACK;
+                    a = a + ((int) Math.random());
                     flowHash.put(a, state);
                 }
             }
