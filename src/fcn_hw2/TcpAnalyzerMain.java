@@ -19,13 +19,8 @@ public class TcpAnalyzerMain {
      public  static int flowCount() {
         int count = 0;
         for(Integer key: flowHash.keySet()) {
-            if ((flowHash.get(key) & SYN) == SYN && (flowHash.get(key) & ACK) != ACK) {
-//                Key temp;
-//                temp = new Key<>(new Object[]{key.t[1], key.t[0]});
-//                if ((flowHash.get(temp) & SYN) == SYN && (flowHash.get(key) & ACK) == ACK) {
+            if (flowHash.get(key) == 3) {
                     count++;
-//                }
-
             }
         }
         return count;

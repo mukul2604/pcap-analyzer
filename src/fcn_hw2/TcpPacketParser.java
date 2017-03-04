@@ -20,7 +20,7 @@ public class TcpPacketParser {
     private long ackNo;
     private int flags;
     private int windowSize;
-
+   // private int state;
 
     public static int byteArrayToInt(byte [] b) {
         StringBuilder sb = new StringBuilder(2* b.length);
@@ -73,12 +73,32 @@ public class TcpPacketParser {
 
         if ((flags & SYN) == SYN && (flags & ACK) != ACK) {
             int a = sourcePort*27 + destinationPort;
-            flowHash.put(a, flags);
+            int state = 1;
+            flowHash.remove(a);
+            flowHash.put(a, state);
         }
 
         if ((flags & SYN) == SYN && (flags & ACK) == ACK) {
-            int  a = destinationPort + sourcePort * 27;
-            flowHash.put(a, flags);
+            int  a = destinationPort*27 + sourcePort;
+            int state = flowHash.get(a);
+            if (state == 1) {
+                state = 2;
+                flowHash.remove(a);
+                flowHash.put(a, state);
+            }
+        }
+
+        if ((flags & SYN) != SYN && (flags & ACK) == ACK) {
+            int a = sourcePort*27 + destinationPort;
+            try {
+            int state = flowHash.get(a);
+            if (state == 2) {
+                state = 3;
+                flowHash.remove(a);
+                flowHash.put(a, state);
+            }} catch (Exception e) {
+               // System.out.println(e);
+            }
         }
         //System.out.println(flowHash.size());
     }
