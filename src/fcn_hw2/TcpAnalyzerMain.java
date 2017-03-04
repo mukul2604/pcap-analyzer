@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 
 
 
+
 public class TcpAnalyzerMain {
     private static int tcpCount = 0;
 
@@ -30,6 +31,7 @@ public class TcpAnalyzerMain {
         Tcp tcp = new Tcp();
         PcapHeader hdr = new PcapHeader(JMemory.POINTER);
         JBuffer buf = new JBuffer(JMemory.POINTER);
+//        JFlowMap map = new JFlowMap();
 
         int id = JRegistry.mapDLTToId(pcap.datalink());
 
@@ -42,12 +44,11 @@ public class TcpAnalyzerMain {
 
             if (packet.hasHeader(tcp)) {
                 tcpCount++;
-                packet.getHeader(tcp);
-                ByteBuffer packetBuffer = ByteBuffer.allocate(tcp.size());
-                tcp.transferTo(packetBuffer);
-                byte[] byteArr = packetBuffer.array();
-                TcpPacketParser tcpPacketParser = new TcpPacketParser(byteArr);
+                ByteBuffer frameBuffer = ByteBuffer.allocate(packet.size());
+                packet.transferTo(frameBuffer);
+                TcpPacketParser tcpPacketParser = new TcpPacketParser(frameBuffer.array());
                 tcpPacketParser.printPacket();
+//                break;
             }
 
         }

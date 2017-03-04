@@ -42,7 +42,8 @@ public class TcpPacketParser {
         return (short) (_1bit | _8bits);
     }
 
-    public TcpPacketParser(byte[] tcpPacketArray){
+    public TcpPacketParser(byte [] frame){
+        byte[] tcpPacketArray = Arrays.copyOfRange(frame, 34, frame.length);
         byte[] subArr;
         subArr = Arrays.copyOfRange(tcpPacketArray,0,2);
 
