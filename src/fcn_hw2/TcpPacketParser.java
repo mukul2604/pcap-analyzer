@@ -74,17 +74,14 @@ public class TcpPacketParser {
         int srcDestKey = sourcePort*27 + destinationPort;
         int destSrcKey = destinationPort*27 + sourcePort;
 
-        if (tcpFlowHashMap.containsKey(srcDestKey))
-            tcpFlowHashMap.get(srcDestKey).push(fPacket);
-
-        if (tcpFlowHashMap.containsKey(destSrcKey))
-            tcpFlowHashMap.get(destSrcKey).push(fPacket);
 
         //FLOW COUNT evaluation
         if ((flags & SYN) == SYN && (flags & ACK) != ACK) {
             int state = SYN;
             flowHash.remove(srcDestKey);
             flowHash.put(srcDestKey, state);
+            TcpFlow flow = new TcpFlow(sourcePort, destinationPort);
+            tcpFlowHashMap.put(srcDestKey, flow);
         }
 
         if ((flags & SYN) == SYN && (flags & ACK) == ACK) {
@@ -100,18 +97,23 @@ public class TcpPacketParser {
         }
 
         if ((flags & SYN) != SYN && (flags & ACK) == ACK) {
-            int a = sourcePort*27 + destinationPort;
-            if (flowHash.containsKey(srcDestKey)) {
+           if (flowHash.containsKey(srcDestKey)) {
                 int state = flowHash.get(srcDestKey);
                 if (state == (SYN|ACK)) {
                     state = ACK;
                     flowHash.remove(srcDestKey);
                     flowHash.put(srcDestKey, state);
-                    TcpFlow flow = new TcpFlow(sourcePort, destinationPort);
-                    tcpFlowHashMap.put(srcDestKey, flow);
+
                 }
             }
         }
+
+        if (tcpFlowHashMap.containsKey(srcDestKey))
+            tcpFlowHashMap.get(srcDestKey).push(fPacket);
+
+        if (tcpFlowHashMap.containsKey(destSrcKey))
+            tcpFlowHashMap.get(destSrcKey).push(fPacket);
+
     }
 
 
