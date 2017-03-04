@@ -2,6 +2,11 @@ package fcn_hw2;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.HashMap;
+
+import static fcn_hw2.TcpAnalyzerMain.SYN;
+import static fcn_hw2.TcpAnalyzerMain.ACK;
+
 
 /**
  * Created by mukul on 2/26/17.
@@ -12,8 +17,9 @@ public class TcpPacketParser {
     private int destinationPort;
     private long seqNo;
     private long ackNo;
-    private short flags;
+    private int flags;
     private int windowSize;
+    private HashMap<Key<Integer>, Integer> flowHash;
 
     public static int byteArrayToInt(byte [] b) {
         StringBuilder sb = new StringBuilder(2* b.length);
@@ -35,11 +41,11 @@ public class TcpPacketParser {
         return val.longValue();
     }
 
-    private short extractFlags(byte[] b) {
+    private int extractFlags(byte[] b) {
         short _8bits = b[1];
         short _1bit = (short) ((b[0] & 0x1) << 8);
 
-        return (short) (_1bit | _8bits);
+        return (_1bit | _8bits);
     }
 
     public TcpPacketParser(byte [] frame){
@@ -63,6 +69,9 @@ public class TcpPacketParser {
 
         subArr = Arrays.copyOfRange(tcpPacketArray, 14, 16);
         this.windowSize = byteArrayToInt(subArr);
+
+
+
     }
 
 
@@ -87,12 +96,11 @@ public class TcpPacketParser {
         return ackNo;
     }
 
-    public short tcpFlags() {
+    public int tcpFlags() {
         return flags;
     }
 
     public int windowSize() {
         return windowSize;
     }
-
 }

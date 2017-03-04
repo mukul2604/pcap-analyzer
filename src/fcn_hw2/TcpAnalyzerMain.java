@@ -14,6 +14,8 @@ import java.nio.ByteBuffer;
 
 public class TcpAnalyzerMain {
     private static int tcpCount = 0;
+    public static final int SYN = 0x002;
+    public static final int ACK = 0x010;
 
     public static void main(String[] args) {
         final String FILE_NAME = "/home/cloudera/workspace/fcn_hw2/src/fcn_hw2/assignment2.pcap";
@@ -35,18 +37,17 @@ public class TcpAnalyzerMain {
 
 
         while (pcap.nextEx(hdr, buf) == Pcap.NEXT_EX_OK) {
-
             PcapPacket packet = new PcapPacket(hdr, buf);
-
             packet.scan(id);
-
             if (packet.hasHeader(tcp)) {
                 tcpCount++;
                 ByteBuffer frameBuffer = ByteBuffer.allocate(packet.size());
                 packet.transferTo(frameBuffer);
                 TcpPacketParser tcpPacketParser = new TcpPacketParser(frameBuffer.array());
                 tcpPacketParser.printPacket();
+                //break;
             }
+
         }
         System.out.printf("Number of tcp Packets:%d\n", tcpCount);
         pcap.close();
