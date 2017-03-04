@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
  * @author Mark Bednarczyk 
  * @author Sly Technologies, Inc. 
  */  
-public class ClassicPcapExample {  
+public class dontuse {
   
     /** 
      * Various examples 
