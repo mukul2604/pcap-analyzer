@@ -84,7 +84,6 @@ public class TcpPacketParser {
                 int state = flowHash.get(a);
                 if (state == SYN) {
                     state = SYN|ACK;
-                    flowHash.remove(a);
                     flowHash.put(a, state);
                 }
             }
@@ -96,7 +95,6 @@ public class TcpPacketParser {
                 int state = flowHash.get(a);
                 if (state == (SYN|ACK)) {
                     state = ACK;
-                    flowHash.remove(a);
                     flowHash.put(a, state);
                 }
             }
