@@ -31,8 +31,6 @@ public class TcpAnalyzerMain {
         Tcp tcp = new Tcp();
         PcapHeader hdr = new PcapHeader(JMemory.POINTER);
         JBuffer buf = new JBuffer(JMemory.POINTER);
-//        JFlowMap map = new JFlowMap();
-
         int id = JRegistry.mapDLTToId(pcap.datalink());
 
 
@@ -48,9 +46,7 @@ public class TcpAnalyzerMain {
                 packet.transferTo(frameBuffer);
                 TcpPacketParser tcpPacketParser = new TcpPacketParser(frameBuffer.array());
                 tcpPacketParser.printPacket();
-//                break;
             }
-
         }
         System.out.printf("Number of tcp Packets:%d\n", tcpCount);
         pcap.close();
