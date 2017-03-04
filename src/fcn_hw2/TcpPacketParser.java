@@ -71,36 +71,36 @@ public class TcpPacketParser {
         subArr = Arrays.copyOfRange(tcpPacketArray, 14, 16);
         this.windowSize = byteArrayToInt(subArr);
 
+        //FLOW COUNT evaluation
         if ((flags & SYN) == SYN && (flags & ACK) != ACK) {
             int a = sourcePort*27 + destinationPort;
-            int state = 1;
-            flowHash.remove(a);
+            int state = SYN;
             flowHash.put(a, state);
         }
 
         if ((flags & SYN) == SYN && (flags & ACK) == ACK) {
             int  a = destinationPort*27 + sourcePort;
-            int state = flowHash.get(a);
-            if (state == 1) {
-                state = 2;
-                flowHash.remove(a);
-                flowHash.put(a, state);
+            if (flowHash.containsKey(a)) {
+                int state = flowHash.get(a);
+                if (state == SYN) {
+                    state = SYN|ACK;
+                    flowHash.remove(a);
+                    flowHash.put(a, state);
+                }
             }
         }
 
         if ((flags & SYN) != SYN && (flags & ACK) == ACK) {
             int a = sourcePort*27 + destinationPort;
-            try {
-            int state = flowHash.get(a);
-            if (state == 2) {
-                state = 3;
-                flowHash.remove(a);
-                flowHash.put(a, state);
-            }} catch (Exception e) {
-               // System.out.println(e);
+            if (flowHash.containsKey(a)) {
+                int state = flowHash.get(a);
+                if (state == (SYN|ACK)) {
+                    state = ACK;
+                    flowHash.remove(a);
+                    flowHash.put(a, state);
+                }
             }
         }
-        //System.out.println(flowHash.size());
     }
 
 

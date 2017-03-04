@@ -16,10 +16,10 @@ public class TcpAnalyzerMain {
     public static final int ACK = 0x010;
     public static HashMap<Integer, Integer> flowHash = new HashMap<>();
 
-     public  static int flowCount() {
+    public  static int flowCount() {
         int count = 0;
         for(Integer key: flowHash.keySet()) {
-            if (flowHash.get(key) == 3) {
+            if (flowHash.get(key) == ACK) {
                     count++;
             }
         }
@@ -59,7 +59,8 @@ public class TcpAnalyzerMain {
             }
 
         }
-        System.out.println(flowCount());
+
+        System.out.println("Flow Count: "+flowCount());
         System.out.printf("Number of tcp Packets:%d\n", tcpCount);
         pcap.close();
     }
