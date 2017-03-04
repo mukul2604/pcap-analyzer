@@ -3,10 +3,7 @@ package fcn_hw2;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-
-import static fcn_hw2.TcpAnalyzerMain.SYN;
-import static fcn_hw2.TcpAnalyzerMain.ACK;
-import static fcn_hw2.TcpAnalyzerMain.flowHash;
+import static fcn_hw2.TcpAnalyzerMain.*;
 
 
 /**
@@ -71,32 +68,47 @@ public class TcpPacketParser {
         subArr = Arrays.copyOfRange(tcpPacketArray, 14, 16);
         this.windowSize = byteArrayToInt(subArr);
 
+        TcpFlowPacket fPacket = new TcpFlowPacket(sourcePort,destinationPort, seqNo,
+                                    ackNo, flags, windowSize);
+
+        int srcDestKey = sourcePort*27 + destinationPort;
+        int destSrcKey = destinationPort*27 + sourcePort;
+
+        if (tcpFlowHashMap.containsKey(srcDestKey))
+            tcpFlowHashMap.get(srcDestKey).push(fPacket);
+
+        if (tcpFlowHashMap.containsKey(destSrcKey))
+            tcpFlowHashMap.get(destSrcKey).push(fPacket);
+
         //FLOW COUNT evaluation
         if ((flags & SYN) == SYN && (flags & ACK) != ACK) {
-            int a = sourcePort*27 + destinationPort;
             int state = SYN;
-            flowHash.put(a, state);
+            flowHash.remove(srcDestKey);
+            flowHash.put(srcDestKey, state);
         }
 
         if ((flags & SYN) == SYN && (flags & ACK) == ACK) {
-            int  a = destinationPort*27 + sourcePort;
-            if (flowHash.containsKey(a)) {
-                int state = flowHash.get(a);
+
+            if (flowHash.containsKey(destSrcKey)) {
+                int state = flowHash.get(destSrcKey);
                 if (state == SYN) {
                     state = SYN|ACK;
-                    flowHash.put(a, state);
+                    flowHash.remove(destSrcKey);
+                    flowHash.put(destSrcKey, state);
                 }
             }
         }
 
         if ((flags & SYN) != SYN && (flags & ACK) == ACK) {
             int a = sourcePort*27 + destinationPort;
-            if (flowHash.containsKey(a)) {
-                int state = flowHash.get(a);
+            if (flowHash.containsKey(srcDestKey)) {
+                int state = flowHash.get(srcDestKey);
                 if (state == (SYN|ACK)) {
                     state = ACK;
-                    a = a + ((int) Math.random());
-                    flowHash.put(a, state);
+                    flowHash.remove(srcDestKey);
+                    flowHash.put(srcDestKey, state);
+                    TcpFlow flow = new TcpFlow(sourcePort, destinationPort);
+                    tcpFlowHashMap.put(srcDestKey, flow);
                 }
             }
         }
