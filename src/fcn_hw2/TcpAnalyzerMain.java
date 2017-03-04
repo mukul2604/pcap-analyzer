@@ -8,11 +8,30 @@ import org.jnetpcap.packet.JRegistry;
 import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 
 public class TcpAnalyzerMain {
     private static int tcpCount = 0;
     public static final int SYN = 0x002;
     public static final int ACK = 0x010;
+    public static HashMap<Long, Integer> flowHash = new HashMap<>();
+
+     public static int flowCount() {
+        int count = 0;
+      //  System.out.println(flowHash.size());
+        for(Long key: flowHash.keySet()) {
+          //  System.out.println(flowHash.get(key));
+            if ((flowHash.get(key) & SYN) == SYN && (flowHash.get(key) & ACK) == ACK) {
+//                Key temp;
+//                temp = new Key<>(new Object[]{key.t[1], key.t[0]});
+//                if ((flowHash.get(temp) & SYN) == SYN && (flowHash.get(key) & ACK) != ACK) {
+                    count++;
+//                }
+
+            }
+        }
+        return count;
+    }
 
     public static void main(String[] args) {
         final String FILE_NAME = "/home/cloudera/workspace/fcn_hw2/src/fcn_hw2/assignment2.pcap";
@@ -41,11 +60,13 @@ public class TcpAnalyzerMain {
                 ByteBuffer frameBuffer = ByteBuffer.allocate(packet.size());
                 packet.transferTo(frameBuffer);
                 TcpPacketParser tcpPacketParser = new TcpPacketParser(frameBuffer.array());
-                tcpPacketParser.printPacket();
+                //tcpPacketParser.printPacket();
+                //tcpPacketParser.dumphash();
                 //break;
             }
 
         }
+        System.out.println("Flow Count: " + flowCount());
         System.out.printf("Number of tcp Packets:%d\n", tcpCount);
         pcap.close();
     }
