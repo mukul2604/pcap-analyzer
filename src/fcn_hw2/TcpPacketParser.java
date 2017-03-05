@@ -78,31 +78,31 @@ public class TcpPacketParser {
         //FLOW COUNT evaluation
         if ((flags & SYN) == SYN && (flags & ACK) != ACK) {
             int state = SYN;
-            flowHash.remove(srcDestKey);
-            flowHash.put(srcDestKey, state);
+            flowCountHash.remove(srcDestKey);
+            flowCountHash.put(srcDestKey, state);
             TcpFlow flow = new TcpFlow(sourcePort, destinationPort);
             tcpFlowHashMap.put(srcDestKey, flow);
         }
 
         if ((flags & SYN) == SYN && (flags & ACK) == ACK) {
 
-            if (flowHash.containsKey(destSrcKey)) {
-                int state = flowHash.get(destSrcKey);
+            if (flowCountHash.containsKey(destSrcKey)) {
+                int state = flowCountHash.get(destSrcKey);
                 if (state == SYN) {
                     state = SYN|ACK;
-                    flowHash.remove(destSrcKey);
-                    flowHash.put(destSrcKey, state);
+                    flowCountHash.remove(destSrcKey);
+                    flowCountHash.put(destSrcKey, state);
                 }
             }
         }
 
         if ((flags & SYN) != SYN && (flags & ACK) == ACK) {
-           if (flowHash.containsKey(srcDestKey)) {
-                int state = flowHash.get(srcDestKey);
+           if (flowCountHash.containsKey(srcDestKey)) {
+                int state = flowCountHash.get(srcDestKey);
                 if (state == (SYN|ACK)) {
                     state = ACK;
-                    flowHash.remove(srcDestKey);
-                    flowHash.put(srcDestKey, state);
+                    flowCountHash.remove(srcDestKey);
+                    flowCountHash.put(srcDestKey, state);
 
                 }
             }
