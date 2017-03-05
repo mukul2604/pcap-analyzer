@@ -23,6 +23,10 @@ public class TcpAnalyzerMain {
             System.out.println("Key:"+ key + "=>");
             System.out.println("Source List: " + tcpFlowHashMap.get(key).getSrcList().size());
             System.out.println("Destination List: " + tcpFlowHashMap.get(key).getDestList().size());
+            TcpFlowPacket p1 = (TcpFlowPacket) tcpFlowHashMap.get(key).getSrcList().get(2);
+            TcpFlowPacket p2 = (TcpFlowPacket) tcpFlowHashMap.get(key).getSrcList().get(3);
+            System.out.println(p1.getSourcePort() + " " + p1.getAckNo() + " " + p1.getSeqNo() + " " + p1.getWindowSize());
+            System.out.println(p2.getSourcePort() + " " + p2.getAckNo() + " " + p2.getSeqNo() + " " + p2.getWindowSize());
         }
     }
 
