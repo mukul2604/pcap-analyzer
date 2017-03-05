@@ -21,21 +21,14 @@ public class TcpAnalyzerMain {
     public static void packetFlowInfoDump() {
         for (Integer key: tcpFlowHashMap.keySet()) {
             System.out.println("=====================================================");
-//            System.out.println("Source List: " + tcpFlowHashMap.get(key).getSrcList().size());
-//            System.out.println("Destination List: " + tcpFlowHashMap.get(key).getDestList().size());
             TcpFlow flow = tcpFlowHashMap.get(key);
             HashMap ackHash = flow.getackHash();
-//            System.out.println("AckHash: " + ackHash.size());
-            TcpFlowPacket p1 = (TcpFlowPacket) flow.getSrcList().get(2);
-            TcpFlowPacket p2 = (TcpFlowPacket) flow.getSrcList().get(3);
             System.out.println("Source Port: " + flow.getSourcePort() + " Destination Port: " +
-                                flow.getDestinationPort());
-            System.out.println("First Transaction:");
-            System.out.println("SeqNo: " + p1.getSeqNo() + " AckNo: " + p1.getAckNo()  + " Window Size: " +
-                                p1.getWindowSize());
-            System.out.println("Second Transaction:");
-            System.out.println("SeqNo: " + p2.getSeqNo() + " AckNo: " + p2.getAckNo()  + " Window Size: " +
-                    p2.getWindowSize());
+                    flow.getDestinationPort());
+            for (int i = 1; i <= 2; i++) {
+                flow.printTransactions(i);
+            }
+
             float lossRate =  (flow.getSrcList().size() * 1.0f)/ ackHash.size();
             System.out.printf("Loss Rate: %.2f\n", lossRate);
         }
@@ -85,7 +78,7 @@ public class TcpAnalyzerMain {
 
         System.out.println("TCP Flow Count: "+flowCount());
         packetFlowInfoDump();
-       // System.out.printf("Number of tcp Packets:%d\n", tcpCount);
+        System.out.printf("Number of tcp Packets:%d\n", tcpCount);
         pcap.close();
     }
 }
