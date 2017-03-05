@@ -17,7 +17,9 @@ public class TcpPacketParser {
     private long ackNo;
     private int flags;
     private int windowSize;
-   // private int state;
+    private int dataOffset;
+    private int dataLen;
+    private int hdrLen;
 
     public static int byteArrayToInt(byte [] b) {
         StringBuilder sb = new StringBuilder(2* b.length);
@@ -46,6 +48,10 @@ public class TcpPacketParser {
         return (_1bit | _8bits);
     }
 
+    private int extractDataOffset(byte b) {
+        return (b >> 4) & 0xf;
+    }
+
     public TcpPacketParser(byte [] frame){
         byte[] tcpPacketArray = Arrays.copyOfRange(frame, 34, frame.length);
         byte[] subArr;
@@ -65,11 +71,15 @@ public class TcpPacketParser {
         subArr = Arrays.copyOfRange(tcpPacketArray, 12,14);
         this.flags = extractFlags(subArr);
 
+        this.dataOffset = extractDataOffset(tcpPacketArray[12]);
+        hdrLen = dataOffset * 4;
+
+        dataLen = tcpPacketArray.length - hdrLen;
         subArr = Arrays.copyOfRange(tcpPacketArray, 14, 16);
         this.windowSize = byteArrayToInt(subArr);
 
         TcpFlowPacket fPacket = new TcpFlowPacket(sourcePort,destinationPort, seqNo,
-                                    ackNo, flags, windowSize);
+                                    ackNo, dataLen, flags, windowSize);
 
         int srcDestKey = sourcePort*27 + destinationPort;
         int destSrcKey = destinationPort*27 + sourcePort;

@@ -14,7 +14,7 @@ public class TcpFlow {
     private List <TcpFlowPacket> destList = new ArrayList<>();
     private int sourcePort;
     private int destinationPort;
-    private HashMap<Long, Long> seqNoHash = new HashMap<>();
+    private HashMap<Long, Long> ackHash = new HashMap<>();
 
     public TcpFlow (int src, int dest) {
         this.sourcePort = src;
@@ -22,17 +22,23 @@ public class TcpFlow {
     }
 
     public void push(TcpFlowPacket flowPacket) {
-
-        // if (seqNoHash.containsKey(flowPacket.getAckNo())) return;
-
+        //System.out.println("Src:" + flowPacket.getSourcePort());
         if (flowPacket.getSourcePort()== sourcePort &&
             flowPacket.getDestinationPort() == destinationPort) {
             srcList.add(flowPacket);
-            seqNoHash.put(flowPacket.getAckNo(), flowPacket.getSeqNo());
+            int val;
+            if (flowPacket.getDataLen() == 0) {
+                val = 1;
+            } else {
+                val = flowPacket.getDataLen();
+            }
+            ackHash.put(flowPacket.getSeqNo() + val, flowPacket.getSeqNo());
         } else if (flowPacket.getDestinationPort() == sourcePort &&
                    flowPacket.getSourcePort()== destinationPort) {
-            destList.add(flowPacket);
-            seqNoHash.put(flowPacket.getAckNo(), flowPacket.getSeqNo());
+            if (ackHash.containsKey(flowPacket.getAckNo())) {
+                destList.add(flowPacket);
+                ackHash.remove(flowPacket.getAckNo());
+            }
         }
     }
 

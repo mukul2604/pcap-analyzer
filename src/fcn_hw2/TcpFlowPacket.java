@@ -10,14 +10,16 @@ public class TcpFlowPacket {
     private long ackNo;
     private int flags;
     private int windowSize;
+    private int dataLen;
 
-    public TcpFlowPacket(int src, int dest, long seq, long ack, int flags, int window) {
+    public TcpFlowPacket(int src, int dest, long seq, long ack, int dlen, int flags, int window) {
         this.sourcePort = src;
         this.destinationPort = dest;
         this.seqNo = seq;
         this.ackNo = ack;
         this.flags = flags;
         this.windowSize = window;
+        this.dataLen = dlen;
     }
 
     public int getSourcePort() {
@@ -44,4 +46,7 @@ public class TcpFlowPacket {
         return windowSize;
     }
 
- }
+    public int getDataLen() {
+        return dataLen;
+    }
+}
