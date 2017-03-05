@@ -37,8 +37,7 @@ public class TcpAnalyzerMain {
             System.out.println("SeqNo: " + p2.getSeqNo() + " AckNo: " + p2.getAckNo()  + " Window Size: " +
                     p2.getWindowSize());
             float lossRate =  (flow.getSrcList().size() * 1.0f)/ ackHash.size();
-            System.out.println("Loss Rate: " + lossRate);
-//            System.out.println(p2.getSourcePort() + " " + p2.getAckNo() + " " + p2.getSeqNo() + " " + p2.getWindowSize());
+            System.out.printf("Loss Rate: %.2f\n", lossRate);
         }
     }
 
@@ -86,7 +85,6 @@ public class TcpAnalyzerMain {
 
         System.out.println("TCP Flow Count: "+flowCount());
         packetFlowInfoDump();
-
        // System.out.printf("Number of tcp Packets:%d\n", tcpCount);
         pcap.close();
     }
