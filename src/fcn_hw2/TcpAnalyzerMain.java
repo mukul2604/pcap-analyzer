@@ -20,7 +20,7 @@ public class TcpAnalyzerMain {
 
     public static void packetFlowInfoDump() {
         for (Integer key: tcpFlowHashMap.keySet()) {
-            System.out.println("=============================================================");
+            System.out.println("=====================================================");
 //            System.out.println("Source List: " + tcpFlowHashMap.get(key).getSrcList().size());
 //            System.out.println("Destination List: " + tcpFlowHashMap.get(key).getDestList().size());
             TcpFlow flow = tcpFlowHashMap.get(key);
