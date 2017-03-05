@@ -75,6 +75,7 @@ public class TcpPacketParser {
         hdrLen = dataOffset * 4;
 
         dataLen = tcpPacketArray.length - hdrLen;
+
         subArr = Arrays.copyOfRange(tcpPacketArray, 14, 16);
         this.windowSize = byteArrayToInt(subArr);
 

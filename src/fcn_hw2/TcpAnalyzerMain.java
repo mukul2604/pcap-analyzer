@@ -18,15 +18,27 @@ public class TcpAnalyzerMain {
     public static HashMap<Integer, Integer> flowCountHash = new HashMap<>();
     public static HashMap<Integer, TcpFlow> tcpFlowHashMap = new HashMap<>();
 
-    public static void packetCount() {
+    public static void packetFlowInfoDump() {
         for (Integer key: tcpFlowHashMap.keySet()) {
-            System.out.println("Key:"+ key + "=>");
-            System.out.println("Source List: " + tcpFlowHashMap.get(key).getSrcList().size());
-            System.out.println("Destination List: " + tcpFlowHashMap.get(key).getDestList().size());
-            TcpFlowPacket p1 = (TcpFlowPacket) tcpFlowHashMap.get(key).getSrcList().get(2);
-            TcpFlowPacket p2 = (TcpFlowPacket) tcpFlowHashMap.get(key).getSrcList().get(3);
-            System.out.println(p1.getSourcePort() + " " + p1.getAckNo() + " " + p1.getSeqNo() + " " + p1.getWindowSize());
-            System.out.println(p2.getSourcePort() + " " + p2.getAckNo() + " " + p2.getSeqNo() + " " + p2.getWindowSize());
+            System.out.println("=============================================================");
+//            System.out.println("Source List: " + tcpFlowHashMap.get(key).getSrcList().size());
+//            System.out.println("Destination List: " + tcpFlowHashMap.get(key).getDestList().size());
+            TcpFlow flow = tcpFlowHashMap.get(key);
+            HashMap ackHash = flow.getackHash();
+//            System.out.println("AckHash: " + ackHash.size());
+            TcpFlowPacket p1 = (TcpFlowPacket) flow.getSrcList().get(2);
+            TcpFlowPacket p2 = (TcpFlowPacket) flow.getSrcList().get(3);
+            System.out.println("Source Port: " + flow.getSourcePort() + " Destination Port: " +
+                                flow.getDestinationPort());
+            System.out.println("First Transaction:");
+            System.out.println("SeqNo: " + p1.getSeqNo() + " AckNo: " + p1.getAckNo()  + " Window Size: " +
+                                p1.getWindowSize());
+            System.out.println("Second Transaction:");
+            System.out.println("SeqNo: " + p2.getSeqNo() + " AckNo: " + p2.getAckNo()  + " Window Size: " +
+                    p2.getWindowSize());
+            float lossRate =  (flow.getSrcList().size() * 1.0f)/ ackHash.size();
+            System.out.println("Loss Rate: " + lossRate);
+//            System.out.println(p2.getSourcePort() + " " + p2.getAckNo() + " " + p2.getSeqNo() + " " + p2.getWindowSize());
         }
     }
 
@@ -72,10 +84,10 @@ public class TcpAnalyzerMain {
 
         }
 
-        System.out.println("Flow Count: "+flowCount());
-        packetCount();
+        System.out.println("TCP Flow Count: "+flowCount());
+        packetFlowInfoDump();
 
-        System.out.printf("Number of tcp Packets:%d\n", tcpCount);
+       // System.out.printf("Number of tcp Packets:%d\n", tcpCount);
         pcap.close();
     }
 }

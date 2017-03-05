@@ -49,4 +49,16 @@ public class TcpFlow {
     public List getDestList() {
         return destList;
     }
+
+    public HashMap getackHash(){
+        return ackHash;
+    }
+
+    public int getSourcePort(){
+        return sourcePort;
+    }
+
+    public int getDestinationPort() {
+        return  destinationPort;
+    }
 }
