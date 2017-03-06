@@ -38,8 +38,6 @@ public class TcpAnalyzerMain {
         return count;
     }
 
-
-
     public static void main(String[] args) {
         final String FILE_NAME = "/home/cloudera/workspace/fcn_hw2/src/fcn_hw2/assignment2.pcap";
         StringBuilder errBuf = new StringBuilder(); // For any error msgs

@@ -162,7 +162,7 @@ public class TcpFlow {
         return  destinationPort;
     }
 
-    public List getTimeStampList() {
+    public List gettimeStampList() {
         return timeStampList;
     }
 
@@ -183,7 +183,7 @@ public class TcpFlow {
 
     private float getEstimatedRtt() {
         // Get Estimated RTT
-        List timeStampList = getTimeStampList();
+        List timeStampList = gettimeStampList();
         Collections.sort(timeStampList);
         int [] timeStamps =  listToArrayInt(timeStampList);
         int [] uniqueTimeStamps;

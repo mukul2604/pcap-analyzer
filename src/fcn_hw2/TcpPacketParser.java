@@ -22,6 +22,7 @@ public class TcpPacketParser {
     private int dataLen;
     private int hdrLen;
 
+
     public static int byteArrayToInt(byte [] b) {
         StringBuilder sb = new StringBuilder(2* b.length);
         for(byte elem: b) {
@@ -69,6 +70,22 @@ public class TcpPacketParser {
         return byteArrayToInt(pat);
     }
 
+    private int extractMSS(byte[] b) {
+        int filter = 0x0204;
+        byte[] pat;// = Arrays.copyOfRange(b, 0,2);
+        int i;
+        for (i = 0; i < b.length - 1; i += 2) {
+            pat = Arrays.copyOfRange(b, i, i+2);
+            if ((filter &  byteArrayToInt(pat)) == filter) {
+                i += 2;
+                break;
+            }
+        }
+        pat =  Arrays.copyOfRange(b, i, i+2);
+        return byteArrayToInt(pat);
+
+    }
+
     public TcpPacketParser(byte [] frame){
         byte[] tcpPacketArray = Arrays.copyOfRange(frame, 34, frame.length);
         byte[] subArr;
@@ -89,15 +106,17 @@ public class TcpPacketParser {
         this.flags = extractFlags(subArr);
 
         this.dataOffset = extractDataOffset(tcpPacketArray[12]);
-        hdrLen = dataOffset * 4;
+        this.hdrLen = dataOffset * 4;
 
-        dataLen = tcpPacketArray.length - hdrLen;
+        this.dataLen = tcpPacketArray.length - hdrLen;
 
         subArr = Arrays.copyOfRange(tcpPacketArray, 14, 16);
         this.windowSize = byteArrayToInt(subArr);
 
         subArr = Arrays.copyOfRange(tcpPacketArray, 20, tcpPacketArray.length);
         this.timeStamp = extractTimeStamp(subArr);
+
+
 
         TcpFlowPacket fPacket = new TcpFlowPacket(sourcePort,destinationPort, seqNo,
                                     ackNo, dataLen, flags, windowSize, timeStamp);
@@ -114,6 +133,8 @@ public class TcpPacketParser {
             flowCountHash.put(srcDestKey, state);
             TcpFlow flow = new TcpFlow(sourcePort, destinationPort);
             tcpFlowHashMap.put(srcDestKey, flow);
+            int maxSegmentSize =  extractMSS(subArr);
+            flow.setMSS(maxSegmentSize);
         }
 
         if ((flags & SYN) == SYN && (flags & ACK) == ACK) {
@@ -140,6 +161,7 @@ public class TcpPacketParser {
             }
         }
 
+        //Don't confuse, it is pushing packets in same flow.
         if (tcpFlowHashMap.containsKey(srcDestKey))
             tcpFlowHashMap.get(srcDestKey).push(fPacket);
 
