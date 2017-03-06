@@ -22,7 +22,7 @@ public class TcpAnalyzerMain {
     public static HashMap<Integer, Integer> flowCountHash = new HashMap<>();
     public static HashMap<Integer, TcpFlow> tcpFlowHashMap = new HashMap<>();
 
-    public static int removeDuplicatesNaive(int[] A) {
+    public static int removeDuplicates(int[] A) {
         if (A.length < 2)
             return A.length;
         int j = 0;
@@ -41,12 +41,14 @@ public class TcpAnalyzerMain {
 
     public static int [] listToArrayInt(List list) {
         int[] ret = new int[list.size()];
-        Iterator<Integer> iter = list.iterator();
+        Iterator<Integer>  iter  = list.iterator();
         for (int i=0; iter.hasNext(); i++) {
             ret[i] = iter.next();
         }
         return ret;
     }
+
+
 
     public static void packetFlowInfoDump() {
         for (Integer key: tcpFlowHashMap.keySet()) {
@@ -55,10 +57,10 @@ public class TcpAnalyzerMain {
             ConcurrentHashMap ackHash = flow.getackHash();
             List timeStampList = flow.gettimeStampList();
             int [] timeStamps =  listToArrayInt(timeStampList);
-
-            int len = removeDuplicatesNaive(timeStamps);
-            int [] uniqueStamps = new int[len];
-            System.arraycopy(timeStamps, 0, uniqueStamps, 0 , len);
+            int [] uniqueTimeStamps;
+            int len = removeDuplicates(timeStamps);
+            uniqueTimeStamps = new int[len];
+            System.arraycopy(timeStamps, 0, uniqueTimeStamps, 0 , len);
 
 
             System.out.println("Source Port: " + flow.getSourcePort() + " Destination Port: " +
