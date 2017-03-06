@@ -21,7 +21,7 @@ public class TcpFlow {
     private int destinationPort;
     private int MSS;
     private ConcurrentHashMap<Long, TcpFlowPacket> ackHash = new ConcurrentHashMap<>();
-    private HashMap<Long, Integer> triAckHash = new HashMap<>();
+    private HashMap<Long, Integer> dupAckHash = new HashMap<>();
    // private HashMap<Integer, Float> timeStampHash = new HashMap<>();
 
     protected int FastRetransmit = 0;
@@ -93,10 +93,10 @@ public class TcpFlow {
            // timeStampHash.put()
             // triple dupAck, if sent packet is found in triAck hash with
             // ackVal = 3 then it means it is fast retransmitted.
-            if (triAckHash.containsKey(flowPacket.getSeqNo())) {
-                int ackVal = triAckHash.get(flowPacket.getSeqNo());
+            if (dupAckHash.containsKey(flowPacket.getSeqNo())) {
+                int ackVal = dupAckHash.get(flowPacket.getSeqNo());
                 if (ackVal == TRIPLE_DUP_ACK) {
-                    triAckHash.remove(flowPacket.getSeqNo());
+                    dupAckHash.remove(flowPacket.getSeqNo());
                     this.FastRetransmit += 1;
                 }
             }
@@ -116,15 +116,15 @@ public class TcpFlow {
                     }
                 }
                 //put this ack into triple ack hash to track fast retransmission
-                triAckHash.put(flowPacket.getAckNo(), 0);
+                dupAckHash.put(flowPacket.getAckNo(), 0);
                 ackHash.remove(flowPacket.getAckNo());
             }
 
-            if (triAckHash.containsKey(flowPacket.getAckNo())) {
-                int value = triAckHash.get(flowPacket.getAckNo());
+            if (dupAckHash.containsKey(flowPacket.getAckNo())) {
+                int value = dupAckHash.get(flowPacket.getAckNo());
                 if ( value < TRIPLE_DUP_ACK) {
-                    triAckHash.remove(flowPacket.getAckNo());
-                    triAckHash.put(flowPacket.getAckNo(), value + 1);
+                    dupAckHash.remove(flowPacket.getAckNo());
+                    dupAckHash.put(flowPacket.getAckNo(), value + 1);
                 }
             }
         }
