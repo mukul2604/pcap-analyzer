@@ -24,21 +24,7 @@ public class TcpAnalyzerMain {
         for (Integer key: tcpFlowHashMap.keySet()) {
             System.out.println("=====================================================");
             TcpFlow flow = tcpFlowHashMap.get(key);
-            int ackHashSize = flow.getackHash().size();
-            float rTTE = flow.getEstimatedRtt();
-            System.out.println("Estimated rtt: " + rTTE);
-
-            System.out.println("Source Port: " + flow.getSourcePort() + " Destination Port: " +
-                                flow.getDestinationPort());
-
-            for (int i = 1; i <= 2; i++) {
-                flow.printTransactions(i);
-            }
-
-            int lossRate =   (ackHashSize + flow.FastRetransmit) ;// flow.getSrcList().size();
-            System.out.printf("Loss: %d\n", lossRate);//flow.getSrcList().size() - flow.ackList().size());
-
-            System.out.println("Number of fast re-transmission: " + flow.FastRetransmit);
+            flow.dumpInfo();
         }
     }
 

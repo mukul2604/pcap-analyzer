@@ -19,6 +19,7 @@ public class TcpFlow {
 
     private int sourcePort;
     private int destinationPort;
+    private int MSS;
     private ConcurrentHashMap<Long, TcpFlowPacket> ackHash = new ConcurrentHashMap<>();
     private HashMap<Long, Integer> triAckHash = new HashMap<>();
    // private HashMap<Integer, Float> timeStampHash = new HashMap<>();
@@ -129,6 +130,14 @@ public class TcpFlow {
         }
     }
 
+    public void setMSS(int MSS) {
+        this.MSS = MSS;
+    }
+
+    public int getMSS(int MSS) {
+        return MSS;
+    }
+
     public List getSrcList() {
         return  srcList;
     }
@@ -153,12 +162,12 @@ public class TcpFlow {
         return  destinationPort;
     }
 
-    public List gettimeStampList() {
+    public List getTimeStampList() {
         return timeStampList;
     }
 
 
-    public void printTransactions(int no) {
+    private void printTransactions(int no) {
         int srcBase = 1;
         int destBase = 0;
         TcpFlowPacket srcP = srcList.get(no+srcBase);
@@ -172,9 +181,9 @@ public class TcpFlow {
     }
 
 
-    public float getEstimatedRtt() {
+    private float getEstimatedRtt() {
         // Get Estimated RTT
-        List timeStampList = gettimeStampList();
+        List timeStampList = getTimeStampList();
         Collections.sort(timeStampList);
         int [] timeStamps =  listToArrayInt(timeStampList);
         int [] uniqueTimeStamps;
@@ -184,4 +193,23 @@ public class TcpFlow {
         deltaArray(uniqueTimeStamps);
         return estimateRTT(uniqueTimeStamps);
     }
+
+    public void dumpInfo() {
+        int ackHashSize = ackHash.size();
+        float rTTE = getEstimatedRtt();
+        System.out.println("Estimated rtt: " + rTTE);
+
+        System.out.println("Source Port: " + sourcePort + " Destination Port: " +
+                destinationPort);
+
+        for (int i = 1; i <= 2; i++) {
+            printTransactions(i);
+        }
+
+        int lossRate =   (ackHashSize + FastRetransmit) ;// flow.getSrcList().size();
+        System.out.printf("Loss: %d\n", lossRate);//flow.getSrcList().size() - flow.ackList().size());
+
+        System.out.println("Number of fast re-transmission: " + FastRetransmit);
+    }
+
 }
