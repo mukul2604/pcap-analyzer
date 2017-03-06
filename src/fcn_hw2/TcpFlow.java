@@ -194,6 +194,11 @@ public class TcpFlow {
         return estimateRTT(uniqueTimeStamps);
     }
 
+    private float theoriticalThroughput(float lossRate) {
+        float thput  = (float) Math.sqrt(3/4);
+        return thput;
+    }
+
     public void dumpInfo() {
         int ackHashSize = ackHash.size();
         float rTTE = getEstimatedRtt();
