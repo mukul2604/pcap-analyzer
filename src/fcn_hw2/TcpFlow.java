@@ -63,6 +63,18 @@ public class TcpFlow {
         }
     }
 
+    private float RTT(float  oldRtt, int newSample) {
+        return (alpha * oldRtt + (1 - alpha) * newSample);
+    }
+
+    private float estimateRTT(int [] deltaArr) {
+        float oldRtt = deltaArr[0];
+        for (int i = 1; i < deltaArr.length-1; i++) {
+            oldRtt = RTT(oldRtt, deltaArr[i]);
+        }
+        return oldRtt;
+    }
+
     public void push(TcpFlowPacket flowPacket) {
         int TRIPLE_DUP_ACK = 3;
         if (flowPacket.getSourcePort()== sourcePort &&

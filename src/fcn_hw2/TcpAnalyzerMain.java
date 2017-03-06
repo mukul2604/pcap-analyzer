@@ -20,9 +20,6 @@ public class TcpAnalyzerMain {
     public static HashMap<Integer, Integer> flowCountHash = new HashMap<>();
     public static HashMap<Integer, TcpFlow> tcpFlowHashMap = new HashMap<>();
 
-
-
-
     public static void packetFlowInfoDump() {
         for (Integer key: tcpFlowHashMap.keySet()) {
             System.out.println("=====================================================");
@@ -55,17 +52,7 @@ public class TcpAnalyzerMain {
         return count;
     }
 
-    public static float RTT(float  oldRtt, int newSample) {
-        return (alpha * oldRtt + (1 - alpha) * newSample);
-    }
 
-    public static float estimateRTT(int [] deltaArr) {
-        float oldRtt = deltaArr[0];
-        for (int i = 1; i < deltaArr.length-1; i++) {
-            oldRtt = RTT(oldRtt, deltaArr[i]);
-        }
-        return oldRtt;
-    }
 
     public static void main(String[] args) {
         final String FILE_NAME = "/home/cloudera/workspace/fcn_hw2/src/fcn_hw2/assignment2.pcap";
