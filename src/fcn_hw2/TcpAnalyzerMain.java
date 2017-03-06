@@ -9,7 +9,7 @@ import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+
 
 public class TcpAnalyzerMain {
     private static int tcpCount = 0;
