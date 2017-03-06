@@ -30,8 +30,8 @@ public class TcpAnalyzerMain {
                 flow.printTransactions(i);
             }
 
-            float lossRate =   (ackHash.size() + flow.FastRetransmit) ;// flow.getSrcList().size();
-            System.out.printf("Loss Rate: %.2f\n", lossRate);
+            int lossRate =   (ackHash.size() + flow.FastRetransmit) ;// flow.getSrcList().size();
+            System.out.printf("Loss: %d\n", lossRate);
         }
     }
 

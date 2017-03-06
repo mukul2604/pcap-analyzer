@@ -39,11 +39,16 @@ public class TcpFlow {
                 val = flowPacket.getDataLen();
             }
             ackHash.put(flowPacket.getSeqNo() + val, flowPacket);
+            if (triAckHash.containsKey(flowPacket.getSeqNo())) {
+                int ackVal = triAckHash.get(flowPacket.getSeqNo());
+                if (ackVal == TRIPLE_DUP_ACK) {
+                    triAckHash.remove(flowPacket.getSeqNo());
+                    this.FastRetransmit += 1;
+                }
+            }
         } else if (flowPacket.getDestinationPort() == sourcePort &&
-                   flowPacket.getSourcePort()== destinationPort) {
-
+                   flowPacket.getSourcePort() == destinationPort) {
             destList.add(flowPacket);
-
             if (ackHash.containsKey(flowPacket.getAckNo())) {
                 //remove all acknowledged packets from ackHash and
                 //move to ackList.
@@ -58,16 +63,16 @@ public class TcpFlow {
                 ackHash.remove(flowPacket.getAckNo());
             }
 
-
             if (triAckHash.containsKey(flowPacket.getAckNo())) {
                 int value = triAckHash.get(flowPacket.getAckNo());
                 if ( value < TRIPLE_DUP_ACK) {
                     triAckHash.remove(flowPacket.getAckNo());
-                    triAckHash.put(flowPacket.getAckNo(), value+1);
-                } else {
-                    triAckHash.remove(flowPacket.getAckNo());
-                    this.FastRetransmit += 1;
+                    triAckHash.put(flowPacket.getAckNo(), value + 1);
                 }
+//                } else {
+//                    triAckHash.remove(flowPacket.getAckNo());
+//                    this.FastRetransmit += 1;
+//                }
             }
         }
     }
