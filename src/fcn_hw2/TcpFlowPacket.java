@@ -11,8 +11,10 @@ public class TcpFlowPacket {
     private int flags;
     private int windowSize;
     private int dataLen;
+    private int timeStamp;
 
-    public TcpFlowPacket(int src, int dest, long seq, long ack, int dlen, int flags, int window) {
+    public TcpFlowPacket(int src, int dest, long seq, long ack,
+                         int dlen, int flags, int window, int timestamp) {
         this.sourcePort = src;
         this.destinationPort = dest;
         this.seqNo = seq;
@@ -20,6 +22,7 @@ public class TcpFlowPacket {
         this.flags = flags;
         this.windowSize = window;
         this.dataLen = dlen;
+        this.timeStamp = timestamp;
     }
 
     public int getSourcePort() {
@@ -48,5 +51,9 @@ public class TcpFlowPacket {
 
     public int getDataLen() {
         return dataLen;
+    }
+
+    public int getTimeStamp() {
+        return  timeStamp;
     }
 }
