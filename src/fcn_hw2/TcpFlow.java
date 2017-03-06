@@ -15,11 +15,14 @@ public class TcpFlow {
     private List <TcpFlowPacket> srcList = new ArrayList<>();
     private List <TcpFlowPacket> destList = new ArrayList<>();
     private List <TcpFlowPacket> ackList = new ArrayList<>();
+    private List <Integer> timeStampList = new ArrayList<>();
 
     private int sourcePort;
     private int destinationPort;
     private ConcurrentHashMap<Long, TcpFlowPacket> ackHash = new ConcurrentHashMap<>();
     private HashMap<Long, Integer> triAckHash = new HashMap<>();
+   // private HashMap<Integer, Float> timeStampHash = new HashMap<>();
+
     protected int FastRetransmit = 0;
 
     public TcpFlow (int src, int dest) {
@@ -31,6 +34,7 @@ public class TcpFlow {
         int TRIPLE_DUP_ACK = 3;
         if (flowPacket.getSourcePort()== sourcePort &&
             flowPacket.getDestinationPort() == destinationPort) {
+            //don't add if contains only  ACK, FIN,ACK
             srcList.add(flowPacket);
             int val;
             if (flowPacket.getDataLen() == 0) {
@@ -38,7 +42,11 @@ public class TcpFlow {
             } else {
                 val = flowPacket.getDataLen();
             }
+
             ackHash.put(flowPacket.getSeqNo() + val, flowPacket);
+           // timeStampHash.put()
+            // triple dupAck, if sent packet is found in triAck hash with
+            // ackVal = 3 then it means it is fast retransmitted.
             if (triAckHash.containsKey(flowPacket.getSeqNo())) {
                 int ackVal = triAckHash.get(flowPacket.getSeqNo());
                 if (ackVal == TRIPLE_DUP_ACK) {
@@ -50,6 +58,9 @@ public class TcpFlow {
                    flowPacket.getSourcePort() == destinationPort) {
             destList.add(flowPacket);
             if (ackHash.containsKey(flowPacket.getAckNo())) {
+                TcpFlowPacket sentPacket = ackHash.get(flowPacket.getAckNo());
+                int timeStamp =  sentPacket.getTimeStamp();
+                timeStampList.add(timeStamp);
                 //remove all acknowledged packets from ackHash and
                 //move to ackList.
                 for(Long key: ackHash.keySet()) {  //need concurrentHashMap for this
@@ -96,6 +107,11 @@ public class TcpFlow {
     public int getDestinationPort() {
         return  destinationPort;
     }
+
+    public List gettimeStampList() {
+        return timeStampList;
+    }
+
 
     public void printTransactions(int no) {
         int srcBase = 1;
