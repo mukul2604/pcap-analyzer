@@ -9,6 +9,7 @@ import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TcpAnalyzerMain {
     private static int tcpCount = 0;
@@ -22,14 +23,14 @@ public class TcpAnalyzerMain {
         for (Integer key: tcpFlowHashMap.keySet()) {
             System.out.println("=====================================================");
             TcpFlow flow = tcpFlowHashMap.get(key);
-            HashMap ackHash = flow.getackHash();
+            ConcurrentHashMap ackHash = flow.getackHash();
             System.out.println("Source Port: " + flow.getSourcePort() + " Destination Port: " +
                     flow.getDestinationPort());
             for (int i = 1; i <= 2; i++) {
                 flow.printTransactions(i);
             }
 
-            float lossRate =  (flow.getSrcList().size() * 1.0f)/ ackHash.size();
+            float lossRate =   (ackHash.size() + flow.FastRetransmit) ;// flow.getSrcList().size();
             System.out.printf("Loss Rate: %.2f\n", lossRate);
         }
     }

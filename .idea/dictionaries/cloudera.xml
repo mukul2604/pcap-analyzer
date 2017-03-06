@@ -2,6 +2,7 @@
   <dictionary name="cloudera">
     <words>
       <w>dlen</w>
+      <w>getack</w>
       <w>pcap</w>
     </words>
   </dictionary>
