@@ -69,10 +69,6 @@ public class TcpFlow {
                     triAckHash.remove(flowPacket.getAckNo());
                     triAckHash.put(flowPacket.getAckNo(), value + 1);
                 }
-//                } else {
-//                    triAckHash.remove(flowPacket.getAckNo());
-//                    this.FastRetransmit += 1;
-//                }
             }
         }
     }
@@ -81,9 +77,13 @@ public class TcpFlow {
         return  srcList;
     }
 
-//    public List getDestList() {
-//        return destList;
-//    }
+    public List getDestList() {
+        return destList;
+    }
+
+    public List ackList() {
+        return  ackList;
+    }
 
     public ConcurrentHashMap getackHash(){
         return ackHash;

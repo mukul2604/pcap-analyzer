@@ -31,7 +31,8 @@ public class TcpAnalyzerMain {
             }
 
             int lossRate =   (ackHash.size() + flow.FastRetransmit) ;// flow.getSrcList().size();
-            System.out.printf("Loss: %d\n", lossRate);
+            System.out.printf("Loss: %d\n", lossRate);//flow.getSrcList().size() - flow.ackList().size());
+            System.out.println("Number of fast re-transmission: " + flow.FastRetransmit);
         }
     }
 
