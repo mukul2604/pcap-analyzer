@@ -1,11 +1,11 @@
 package fcn_hw2;
 
-import org.jnetpcap.protocol.tcpip.Tcp;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static fcn_hw2.TcpAnalyzerMain.*;
 
 
 /**
@@ -28,6 +28,39 @@ public class TcpFlow {
     public TcpFlow (int src, int dest) {
         this.sourcePort = src;
         this.destinationPort =dest;
+    }
+
+    private int removeDuplicates(int[] A) {
+        if (A.length < 2)
+            return A.length;
+        int j = 0;
+        int i = 1;
+        while (i < A.length) {
+            if (A[i] == A[j]) {
+                i++;
+            } else {
+                j++;
+                A[j] = A[i];
+                i++;
+            }
+        }
+        return j + 1;
+    }
+
+    private int [] listToArrayInt(List list) {
+        int[] ret = new int[list.size()];
+        Iterator<Integer> iter  = list.iterator();
+        for (int i=0; iter.hasNext(); i++) {
+            ret[i] = iter.next();
+        }
+        return ret;
+    }
+
+    private void deltaArray(int []  arr) {
+        int i;
+        for (i = 0 ; i < arr.length-1; i++) {
+            arr[i] = arr[i+1] - arr[i];
+        }
     }
 
     public void push(TcpFlowPacket flowPacket) {
@@ -124,5 +157,19 @@ public class TcpFlow {
                 srcP.getWindowSize());
         System.out.println("SeqNo: " + destP.getSeqNo() + " AckNo: " + destP.getAckNo()  + " Window Size: " +
                 destP.getWindowSize());
+    }
+
+
+    public float getEstimatedRtt() {
+        // Get Estimated RTT
+        List timeStampList = gettimeStampList();
+        Collections.sort(timeStampList);
+        int [] timeStamps =  listToArrayInt(timeStampList);
+        int [] uniqueTimeStamps;
+        int len = removeDuplicates(timeStamps);
+        uniqueTimeStamps = new int[len];
+        System.arraycopy(timeStamps, 0, uniqueTimeStamps, 0 , len);
+        deltaArray(uniqueTimeStamps);
+        return estimateRTT(uniqueTimeStamps);
     }
 }
