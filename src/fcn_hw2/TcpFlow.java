@@ -234,7 +234,8 @@ public class TcpFlow {
         System.out.printf("Sender: %d\tReceived: %d\n", srcList.size(), ackList.size());
         System.out.printf("Loss rate: %.4f\n", lossRate);//flow.getSrcList().size() - flow.ackList().size());
 
-        System.out.println("Number of fast re-transmission: " + FastRetransmit);
+        System.out.println("Number of fast re-transmissions: " + FastRetransmit);
+        System.out.println("Number of re-transmissions: " + reTransmit);
     }
 
 }
