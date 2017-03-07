@@ -25,6 +25,7 @@ public class TcpFlow {
     private long RTO = 0;
     private long iRTT = 0;
 
+
     private ConcurrentHashMap<Long, TcpFlowPacket> ackHash = new ConcurrentHashMap<>();
     private HashMap<Long, TcpFlowPacket> dupAckHash = new HashMap<>();
    // private HashMap<Integer, Float> timeStampHash = new HashMap<>();
@@ -215,18 +216,21 @@ public class TcpFlow {
                 destP.getWindowSize());
     }
 
+    private long[] getDeltaStamps() {
+        List timeStampList = getTimeStampList();
+        long[] timeStamps = listToArrayLong(timeStampList);
+        long[] deltaStamps = deltaArray(timeStamps);
+        return deltaStamps;
+    }
 
     private float getEstimatedRtt() {
         // Get Estimated RTT
-        List timeStampList = getTimeStampList();
-        long [] timeStamps =  listToArrayLong(timeStampList);
-        long [] deltaStamps = deltaArray(timeStamps);
-        return estimateRTT(deltaStamps);
+        return estimateRTT(getDeltaStamps());
     }
 
-    private float theoriticalThroughput(float lossRate) {
-        float thput  = (float) Math.sqrt(3/4);
-        return thput;
+    private float empiricalThroughput(float lossRate) {
+        return (float) 1.0;
+        //return thput;
     }
 
     public void dumpInfo() {
