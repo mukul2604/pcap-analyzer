@@ -11,6 +11,8 @@ import static fcn_hw2.TcpAnalyzerMain.*;
 /**
  * Created by mukul on 3/4/17.
  */
+
+
 public class TcpFlow {
     private List <TcpFlowPacket> srcList = new ArrayList<>();
     private List <TcpFlowPacket> destList = new ArrayList<>();
@@ -20,11 +22,15 @@ public class TcpFlow {
     private int sourcePort;
     private int destinationPort;
     private int MSS;
+    private int RTO = 0;
+    private int iRTT = 0;
+
     private ConcurrentHashMap<Long, TcpFlowPacket> ackHash = new ConcurrentHashMap<>();
-    private HashMap<Long, Integer> dupAckHash = new HashMap<>();
+    private HashMap<Long, TcpFlowPacket> dupAckHash = new HashMap<>();
    // private HashMap<Integer, Float> timeStampHash = new HashMap<>();
 
     protected int FastRetransmit = 0;
+    protected int reTransmit = 0;
 
     public TcpFlow (int src, int dest) {
         this.sourcePort = src;
@@ -94,13 +100,22 @@ public class TcpFlow {
             // triple dupAck, if sent packet is found in triAck hash with
             // ackVal = 3 then it means it is fast retransmitted.
             if (dupAckHash.containsKey(flowPacket.getSeqNo())) {
-                int ackVal = dupAckHash.get(flowPacket.getSeqNo());
+                int ackVal = dupAckHash.get(flowPacket.getSeqNo()).getAckCount();
                 if (ackVal == TRIPLE_DUP_ACK) {
                     dupAckHash.remove(flowPacket.getSeqNo());
                     this.FastRetransmit += 1;
                 } else {
-                    //if flowpacket.tsval - hashpackettsval > RTO
-                    // then this.retransmit += 1;
+                    if (this.iRTT == 0) {
+                        this.iRTT = srcList.get(1).getTimeStamp() - srcList.get(0).getTimeStamp();
+                        this.RTO = 2 * this.iRTT;
+                    }
+
+                    int diff = flowPacket.getTimeStamp() - ackHash.get(flowPacket.getSeqNo()+val).getTimeStamp();
+                    TcpFlowPacket p  = ackHash.get(flowPacket.getSeqNo()+ val);
+                    if (diff > RTO) {
+                        this.reTransmit += 1;
+                    }
+
                 }
             }
         } else if (flowPacket.getDestinationPort() == sourcePort &&
@@ -119,15 +134,17 @@ public class TcpFlow {
                     }
                 }
                 //put this ack into triple ack hash to track fast retransmission
-                dupAckHash.put(flowPacket.getAckNo(), 0);
+                flowPacket.setAckCount(0);
+                dupAckHash.put(flowPacket.getAckNo(), flowPacket);
                 ackHash.remove(flowPacket.getAckNo());
             }
 
             if (dupAckHash.containsKey(flowPacket.getAckNo())) {
-                int value = dupAckHash.get(flowPacket.getAckNo());
+                int value = dupAckHash.get(flowPacket.getAckNo()).getAckCount();
                 if ( value < TRIPLE_DUP_ACK) {
-                    dupAckHash.remove(flowPacket.getAckNo());
-                    dupAckHash.put(flowPacket.getAckNo(), value + 1);
+                    TcpFlowPacket acp = dupAckHash.get(flowPacket.getAckNo());
+                    acp.setAckCount(value+1);
+                    dupAckHash.put(flowPacket.getAckNo(), acp);
                 }
             }
         }
@@ -214,7 +231,7 @@ public class TcpFlow {
             printTransactions(i);
         }
 
-        int lossRate =   (ackHashSize + FastRetransmit) ;// flow.getSrcList().size();
+        int lossRate =   (ackHashSize + FastRetransmit +reTransmit) ;// flow.getSrcList().size();
         System.out.printf("Loss: %d\n", lossRate);//flow.getSrcList().size() - flow.ackList().size());
 
         System.out.println("Number of fast re-transmission: " + FastRetransmit);

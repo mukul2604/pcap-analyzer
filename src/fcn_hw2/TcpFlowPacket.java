@@ -12,6 +12,7 @@ public class TcpFlowPacket {
     private int windowSize;
     private int dataLen;
     private int timeStamp;
+    private int ackCount;
 
     public TcpFlowPacket(int src, int dest, long seq, long ack,
                          int dlen, int flags, int window, int timestamp) {
@@ -56,4 +57,14 @@ public class TcpFlowPacket {
     public int getTimeStamp() {
         return  timeStamp;
     }
+
+    public int getAckCount() {
+        return ackCount;
+    }
+
+    public void setAckCount(int ackCount) {
+        this.ackCount = ackCount;
+    }
 }
+
+
