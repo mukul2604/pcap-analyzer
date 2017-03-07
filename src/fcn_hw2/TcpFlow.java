@@ -185,7 +185,7 @@ public class TcpFlow {
         return  destinationPort;
     }
 
-    public List gettimeStampList() {
+    public List getTimeStampList() {
         return timeStampList;
     }
 
@@ -206,7 +206,7 @@ public class TcpFlow {
 
     private float getEstimatedRtt() {
         // Get Estimated RTT
-        List timeStampList = gettimeStampList();
+        List timeStampList = getTimeStampList();
         long [] timeStamps =  listToArrayLong(timeStampList);
         long [] deltaStamps = deltaArray(timeStamps);
         return estimateRTT(deltaStamps);
@@ -232,7 +232,7 @@ public class TcpFlow {
         //int lossRate =   (ackHashSize + FastRetransmit +reTransmit) ;// flow.getSrcList().size();
         float lossRate = ((srcList.size() - ackList.size()) * 1.0f) / srcList.size();
         System.out.printf("Sender: %d\tReceived: %d\n", srcList.size(), ackList.size());
-        System.out.printf("Loss: %.4f\n", lossRate);//flow.getSrcList().size() - flow.ackList().size());
+        System.out.printf("Loss rate: %.4f\n", lossRate);//flow.getSrcList().size() - flow.ackList().size());
 
         System.out.println("Number of fast re-transmission: " + FastRetransmit);
     }
