@@ -117,10 +117,10 @@ public class TcpPacketParser {
 //        subArr = Arrays.copyOfRange(tcpPacketArray, 20, tcpPacketArray.length);
 //        this.timeStamp = extractTimeStamp(subArr);
 
-
+        int frameLen = frame.length;
 
         TcpFlowPacket fPacket = new TcpFlowPacket(sourcePort,destinationPort, seqNo,
-                                    ackNo, dataLen, flags, windowSize, timeStamp);
+                                    ackNo, dataLen, frameLen, flags, windowSize, timeStamp);
 
 
         int srcDestKey = sourcePort*27 + destinationPort;

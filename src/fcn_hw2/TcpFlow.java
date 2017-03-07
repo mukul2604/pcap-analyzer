@@ -228,10 +228,23 @@ public class TcpFlow {
         return estimateRTT(getDeltaStamps());
     }
 
-    private float empiricalThroughput(float lossRate) {
-        return (float) 1.0;
-        //return thput;
+    private float empiricalThroughput() {
+        int i;
+        long totalTime = 0;
+        long totalData = 0;
+
+        long [] arr = getDeltaStamps();
+        for (i=0; i < arr.length; i++) {
+            totalTime += arr[i];
+        }
+
+        for(i=0; i< srcList.size(); i++) {
+            totalData += srcList.get(i).getFrameLen();
+        }
+
+        return  ((totalData*1.0f) / totalTime) * 1000;
     }
+
 
     public void dumpInfo() {
         int ackHashSize = ackHash.size();
@@ -252,6 +265,7 @@ public class TcpFlow {
 
         System.out.println("Number of fast re-transmissions: " + FastRetransmit);
         System.out.println("Number of re-transmissions: " + reTransmit);
+        System.out.printf("Empirical Throughput: %.4f bps\n", empiricalThroughput());
     }
 
 }
