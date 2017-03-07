@@ -86,6 +86,8 @@ public class TcpFlow {
 
     public void push(TcpFlowPacket flowPacket) {
         int TRIPLE_DUP_ACK = 3;
+        TcpFlowPacket possibleDup = null;
+        
         if (flowPacket.getSourcePort()== sourcePort &&
             flowPacket.getDestinationPort() == destinationPort) {
             //don't add if contains only  ACK, FIN,ACK
@@ -97,12 +99,19 @@ public class TcpFlow {
                 val = flowPacket.getDataLen();
             }
 
-            ackHash.put(flowPacket.getSeqNo() + val, flowPacket);
+            if (ackHash.containsKey(flowPacket.getSeqNo() + val)) {
+                possibleDup = ackHash.get(flowPacket.getSeqNo() + val);
+                ackHash.remove(flowPacket.getSeqNo() + val);
+                ackHash.put(flowPacket.getSeqNo() + val, flowPacket);
+            } else {
+                ackHash.put(flowPacket.getSeqNo() + val, flowPacket);
+            }
            // timeStampHash.put()
             // triple dupAck, if sent packet is found in triAck hash with
             // ackVal = 3 then it means it is fast retransmitted.
             if (dupAckHash.containsKey(flowPacket.getSeqNo())) {
-                int ackVal = dupAckHash.get(flowPacket.getSeqNo()).getAckCount();
+                TcpFlowPacket dupPacket = dupAckHash.get(flowPacket.getSeqNo());
+                int ackVal = dupPacket.getAckCount();
                 if (ackVal == TRIPLE_DUP_ACK) {
                     dupAckHash.remove(flowPacket.getSeqNo());
                     this.FastRetransmit += 1;
@@ -112,12 +121,15 @@ public class TcpFlow {
                         this.RTO = 2 * this.iRTT;
                     }
 
-                    long diff = flowPacket.getTimeStamp() - ackHash.get(flowPacket.getSeqNo()+val).getTimeStamp();
-                    TcpFlowPacket p  = ackHash.get(flowPacket.getSeqNo()+ val);
-                    if (diff > RTO) {
-                        this.reTransmit += 1;
-                    }
+                    if (possibleDup != null) {
+                        long diff = flowPacket.getTimeStamp() - possibleDup.getTimeStamp();
 
+                        TcpFlowPacket p = ackHash.get(flowPacket.getSeqNo() + val);
+                        if (diff > RTO) {
+                            this.reTransmit += 1;
+                            dupAckHash.remove(flowPacket.getSeqNo());
+                        }
+                    }
                 }
             }
         } else if (flowPacket.getDestinationPort() == sourcePort &&
