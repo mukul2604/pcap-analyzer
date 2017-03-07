@@ -24,6 +24,7 @@ public class TcpFlow {
     private int MSS;
     private long RTO = 0;
     private long iRTT = 0;
+    private int ACK_FINACK = 2;
 
 
     private ConcurrentHashMap<Long, TcpFlowPacket> ackHash = new ConcurrentHashMap<>();
@@ -259,8 +260,8 @@ public class TcpFlow {
         }
 
         //int lossRate =   (ackHashSize + FastRetransmit +reTransmit) ;// flow.getSrcList().size();
-        float lossRate = ((srcList.size() - ackList.size()) * 1.0f) / srcList.size();
-        System.out.printf("Sender: %d\tReceived: %d\n", srcList.size(), ackList.size());
+        float lossRate = ((srcList.size() - ACK_FINACK - ackList.size()) * 1.0f) / srcList.size();
+        System.out.printf("Sender: %d\tReceived: %d\n", srcList.size() - ACK_FINACK, ackList.size());
         System.out.printf("Loss rate: %.4f\n", lossRate);//flow.getSrcList().size() - flow.ackList().size());
 
         System.out.println("Number of fast re-transmissions: " + FastRetransmit);
