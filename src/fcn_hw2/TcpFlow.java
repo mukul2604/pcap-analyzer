@@ -98,6 +98,9 @@ public class TcpFlow {
                 if (ackVal == TRIPLE_DUP_ACK) {
                     dupAckHash.remove(flowPacket.getSeqNo());
                     this.FastRetransmit += 1;
+                } else {
+                    //if flowpacket.tsval - hashpackettsval > RTO
+                    // then this.retransmit += 1;
                 }
             }
         } else if (flowPacket.getDestinationPort() == sourcePort &&
