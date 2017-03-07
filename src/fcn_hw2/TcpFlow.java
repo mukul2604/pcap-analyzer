@@ -17,13 +17,13 @@ public class TcpFlow {
     private List <TcpFlowPacket> srcList = new ArrayList<>();
     private List <TcpFlowPacket> destList = new ArrayList<>();
     private List <TcpFlowPacket> ackList = new ArrayList<>();
-    private List <Integer> timeStampList = new ArrayList<>();
+    private List <Long> timeStampList = new ArrayList<>();
 
     private int sourcePort;
     private int destinationPort;
     private int MSS;
-    private int RTO = 0;
-    private int iRTT = 0;
+    private long RTO = 0;
+    private long iRTT = 0;
 
     private ConcurrentHashMap<Long, TcpFlowPacket> ackHash = new ConcurrentHashMap<>();
     private HashMap<Long, TcpFlowPacket> dupAckHash = new HashMap<>();
@@ -37,7 +37,7 @@ public class TcpFlow {
         this.destinationPort =dest;
     }
 
-    private int removeDuplicates(int[] A) {
+    private int removeDuplicates(long[] A) {
         if (A.length < 2)
             return A.length;
         int j = 0;
@@ -54,27 +54,29 @@ public class TcpFlow {
         return j + 1;
     }
 
-    private int [] listToArrayInt(List list) {
-        int[] ret = new int[list.size()];
-        Iterator<Integer> iter  = list.iterator();
+    private long [] listToArrayLong(List list) {
+        long[] ret = new long[list.size()];
+        Iterator<Long> iter  = list.iterator();
         for (int i=0; iter.hasNext(); i++) {
             ret[i] = iter.next();
         }
         return ret;
     }
 
-    private void deltaArray(int []  arr) {
+    private long [] deltaArray(long []  arr) {
         int i;
-        for (i = 0 ; i < arr.length-1; i++) {
-            arr[i] = arr[i+1] - arr[i];
+        List<Long> temp = new ArrayList();
+        for (i = 0 ; i < arr.length-3; i+=2) {
+            temp.add(arr[i+1] - arr[i]);
         }
+        return listToArrayLong(temp);
     }
 
-    private float RTT(float  oldRtt, int newSample) {
+    private float RTT(float  oldRtt, long newSample) {
         return (alpha * oldRtt + (1 - alpha) * newSample);
     }
 
-    private float estimateRTT(int [] deltaArr) {
+    private float estimateRTT(long [] deltaArr) {
         float oldRtt = deltaArr[0];
         for (int i = 1; i < deltaArr.length-1; i++) {
             oldRtt = RTT(oldRtt, deltaArr[i]);
@@ -110,7 +112,7 @@ public class TcpFlow {
                         this.RTO = 2 * this.iRTT;
                     }
 
-                    int diff = flowPacket.getTimeStamp() - ackHash.get(flowPacket.getSeqNo()+val).getTimeStamp();
+                    long diff = flowPacket.getTimeStamp() - ackHash.get(flowPacket.getSeqNo()+val).getTimeStamp();
                     TcpFlowPacket p  = ackHash.get(flowPacket.getSeqNo()+ val);
                     if (diff > RTO) {
                         this.reTransmit += 1;
@@ -123,8 +125,9 @@ public class TcpFlow {
             destList.add(flowPacket);
             if (ackHash.containsKey(flowPacket.getAckNo())) {
                 TcpFlowPacket sentPacket = ackHash.get(flowPacket.getAckNo());
-                int timeStamp =  sentPacket.getTimeStamp();
+                long timeStamp =  sentPacket.getTimeStamp();
                 timeStampList.add(timeStamp);
+                timeStampList.add(flowPacket.getTimeStamp());
                 //remove all acknowledged packets from ackHash and
                 //move to ackList.
                 for(Long key: ackHash.keySet()) {  //need concurrentHashMap for this
@@ -204,14 +207,9 @@ public class TcpFlow {
     private float getEstimatedRtt() {
         // Get Estimated RTT
         List timeStampList = gettimeStampList();
-        Collections.sort(timeStampList);
-        int [] timeStamps =  listToArrayInt(timeStampList);
-        int [] uniqueTimeStamps;
-        int len = removeDuplicates(timeStamps);
-        uniqueTimeStamps = new int[len];
-        System.arraycopy(timeStamps, 0, uniqueTimeStamps, 0 , len);
-        deltaArray(uniqueTimeStamps);
-        return estimateRTT(uniqueTimeStamps);
+        long [] timeStamps =  listToArrayLong(timeStampList);
+        long [] deltaStamps = deltaArray(timeStamps);
+        return estimateRTT(deltaStamps);
     }
 
     private float theoriticalThroughput(float lossRate) {
@@ -222,7 +220,7 @@ public class TcpFlow {
     public void dumpInfo() {
         int ackHashSize = ackHash.size();
         float rTTE = getEstimatedRtt();
-        System.out.println("Estimated rtt: " + rTTE);
+        System.out.println("Estimated rtt: " + rTTE + " msecs.");
 
         System.out.println("Source Port: " + sourcePort + " Destination Port: " +
                 destinationPort);
@@ -231,8 +229,10 @@ public class TcpFlow {
             printTransactions(i);
         }
 
-        int lossRate =   (ackHashSize + FastRetransmit +reTransmit) ;// flow.getSrcList().size();
-        System.out.printf("Loss: %d\n", lossRate);//flow.getSrcList().size() - flow.ackList().size());
+        //int lossRate =   (ackHashSize + FastRetransmit +reTransmit) ;// flow.getSrcList().size();
+        float lossRate = ((srcList.size() - ackList.size()) * 1.0f) / srcList.size();
+        System.out.printf("Sender: %d\tReceived: %d\n", srcList.size(), ackList.size());
+        System.out.printf("Loss: %.4f\n", lossRate);//flow.getSrcList().size() - flow.ackList().size());
 
         System.out.println("Number of fast re-transmission: " + FastRetransmit);
     }

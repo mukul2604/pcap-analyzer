@@ -64,7 +64,8 @@ public class TcpAnalyzerMain {
                 tcpCount++;
                 ByteBuffer frameBuffer = ByteBuffer.allocate(packet.size());
                 packet.transferTo(frameBuffer);
-                TcpPacketParser tcpPacketParser = new TcpPacketParser(frameBuffer.array());
+                long tsmsecs = packet.getCaptureHeader().timestampInMillis();
+                TcpPacketParser tcpPacketParser = new TcpPacketParser(frameBuffer.array(), tsmsecs);
                 tcpPacketParser.ackNo();
             }
 

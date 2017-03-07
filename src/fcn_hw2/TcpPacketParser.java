@@ -17,10 +17,11 @@ public class TcpPacketParser {
     private long ackNo;
     private int flags;
     private int windowSize;
-    private int timeStamp;
+//    private int timeStamp;
     private int dataOffset;
     private int dataLen;
     private int hdrLen;
+
 
 
     public static int byteArrayToInt(byte [] b) {
@@ -86,7 +87,7 @@ public class TcpPacketParser {
 
     }
 
-    public TcpPacketParser(byte [] frame){
+    public TcpPacketParser(byte [] frame, long timeStamp){
         byte[] tcpPacketArray = Arrays.copyOfRange(frame, 34, frame.length);
         byte[] subArr;
         subArr = Arrays.copyOfRange(tcpPacketArray,0,2);
@@ -113,8 +114,8 @@ public class TcpPacketParser {
         subArr = Arrays.copyOfRange(tcpPacketArray, 14, 16);
         this.windowSize = byteArrayToInt(subArr);
 
-        subArr = Arrays.copyOfRange(tcpPacketArray, 20, tcpPacketArray.length);
-        this.timeStamp = extractTimeStamp(subArr);
+//        subArr = Arrays.copyOfRange(tcpPacketArray, 20, tcpPacketArray.length);
+//        this.timeStamp = extractTimeStamp(subArr);
 
 
 
