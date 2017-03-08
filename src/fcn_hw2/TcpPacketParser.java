@@ -118,6 +118,7 @@ public class TcpPacketParser {
 
 
         int segmentLen = tcpPacketArray.length;
+        //   int framelen = frame.length;
 
         TcpFlowPacket fPacket = new TcpFlowPacket(sourcePort,destinationPort, seqNo,
                                     ackNo, dataLen, segmentLen, flags, windowSize, timeStamp);
