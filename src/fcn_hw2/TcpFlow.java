@@ -26,6 +26,7 @@ public class TcpFlow {
     private long RTO = 0;
     private long iRTT = 0;
     private int ACK_FINACK = 2;
+    private int initialWindowSize;
 
 
     private ConcurrentHashMap<Long, TcpFlowPacket> ackHash = new ConcurrentHashMap<>();
@@ -244,14 +245,23 @@ public class TcpFlow {
             totalData += srcList.get(i).getFrameLen();
         }
 
-        return  ((totalData*1.0f) / totalTime) * 1000;
+        return  (((totalData*8.0f) / totalTime) * 1000)/1024;
     }
 
+    private float theoreticalThroughPut(float RTT) {
+        float constant = 1.0f;
+        float lossrate = ((srcList.size() - ACK_FINACK - ackList.size()) * 1.0f) / srcList.size();
+        float rhoroot = (float) Math.sqrt(lossrate);
+
+        if (rhoroot == 0) {
+            return ((initialWindowSize * 8000.0f) / RTT)/1024;
+        } else {
+            return ((MSS * constant * 8000.0f) / (rhoroot * RTT))/1024;
+        }
+    }
 
     public void dumpInfo() {
-        int ackHashSize = ackHash.size();
         float rTTE = getEstimatedRtt();
-        System.out.println("Estimated rtt: " + rTTE + " msecs.");
 
         System.out.println("Source Port: " + sourcePort + " Destination Port: " +
                 destinationPort);
@@ -260,14 +270,15 @@ public class TcpFlow {
             printTransactions(i);
         }
 
-        //int lossRate =   (ackHashSize + FastRetransmit +reTransmit) ;// flow.getSrcList().size();
         float lossRate = ((srcList.size() - ACK_FINACK - ackList.size()) * 1.0f) / srcList.size();
         System.out.printf("Sender: %d\tReceived: %d\n", srcList.size() - ACK_FINACK, ackList.size());
-        System.out.printf("Loss rate: %.4f\n", lossRate);//flow.getSrcList().size() - flow.ackList().size());
+        System.out.printf("Loss rate: %.4f\n", lossRate);
 
         System.out.println("Number of fast re-transmissions: " + FastRetransmit);
         System.out.println("Number of re-transmissions: " + reTransmit);
-        System.out.printf("Empirical Throughput: %.4f bps\n", empiricalThroughput());
+        System.out.println("Estimated rtt: " + rTTE + " msecs.");
+        System.out.printf("Empirical Throughput: %.2f Kbps\n", empiricalThroughput());
+        System.out.printf("Theoretical Throughput: %.2f Kbps \n", theoreticalThroughPut(rTTE));
     }
 
     public int getWinScale() {
@@ -276,5 +287,13 @@ public class TcpFlow {
 
     public void setWinScale(int winScale) {
         this.winScale = winScale;
+    }
+
+    public int getInitialWindowSize() {
+        return initialWindowSize;
+    }
+
+    public void setInitialWindowSize(int initialWindowSize) {
+        this.initialWindowSize = initialWindowSize;
     }
 }

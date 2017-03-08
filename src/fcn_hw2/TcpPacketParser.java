@@ -155,6 +155,7 @@ public class TcpPacketParser {
             flow.setMSS(maxSegmentSize);
             int winScale = extractWindowScale(subArr);
             flow.setWinScale(winScale);
+            flow.setInitialWindowSize(windowSize);
         }
 
         if ((flags & SYN) == SYN && (flags & ACK) == ACK) {
