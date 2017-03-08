@@ -231,7 +231,7 @@ public class TcpFlow {
 
     private float empiricalThroughput() {
         int i;
-        long totalTime = 0;
+        long totalTime;
         long totalData = 0;
 
         totalTime = srcList.get(srcList.size()-1).getTimeStamp() - srcList.get(0).getTimeStamp();
