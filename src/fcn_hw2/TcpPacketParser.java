@@ -59,7 +59,7 @@ public class TcpPacketParser {
         int filter = 0x080a;
         byte[] pat;// = Arrays.copyOfRange(b, 0,2);
         int i;
-        for (i = 0; i < b.length - 1; i += 2) {
+        for (i = 0; i < b.length - 1; i += 1) {
             pat = Arrays.copyOfRange(b, i, i+2);
             if ((filter &  byteArrayToInt(pat)) == filter) {
                 i += 2;
@@ -75,7 +75,7 @@ public class TcpPacketParser {
         int filter = 0x0204;
         byte[] pat;// = Arrays.copyOfRange(b, 0,2);
         int i;
-        for (i = 0; i < b.length - 1; i += 2) {
+        for (i = 0; i < b.length - 1; i += 1) {
             pat = Arrays.copyOfRange(b, i, i+2);
             if ((filter &  byteArrayToInt(pat)) == filter) {
                 i += 2;
@@ -84,6 +84,21 @@ public class TcpPacketParser {
         }
         pat =  Arrays.copyOfRange(b, i, i+2);
         return byteArrayToInt(pat);
+
+    }
+
+    private int extractWindowScale(byte[] b) {
+        int filter = 0x0303;
+        byte[] pat;
+        int i;
+        for (i = 0; i < b.length - 1; i += 1) {
+            pat = Arrays.copyOfRange(b, i, i+2);
+            if ((filter &  byteArrayToInt(pat)) == filter) {
+                i += 2;
+                break;
+            }
+        }
+        return b[i];
 
     }
 
@@ -117,6 +132,7 @@ public class TcpPacketParser {
 //        subArr = Arrays.copyOfRange(tcpPacketArray, 20, tcpPacketArray.length);
 //        this.timeStamp = extractTimeStamp(subArr);
 
+
         int frameLen = frame.length;
 
         TcpFlowPacket fPacket = new TcpFlowPacket(sourcePort,destinationPort, seqNo,
@@ -134,8 +150,11 @@ public class TcpPacketParser {
             flowCountHash.put(srcDestKey, state);
             TcpFlow flow = new TcpFlow(sourcePort, destinationPort);
             tcpFlowHashMap.put(srcDestKey, flow);
+            subArr = Arrays.copyOfRange(tcpPacketArray, 20, tcpPacketArray.length);
             int maxSegmentSize =  extractMSS(subArr);
             flow.setMSS(maxSegmentSize);
+            int winScale = extractWindowScale(subArr);
+            flow.setWinScale(winScale);
         }
 
         if ((flags & SYN) == SYN && (flags & ACK) == ACK) {

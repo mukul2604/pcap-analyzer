@@ -22,6 +22,7 @@ public class TcpFlow {
     private int sourcePort;
     private int destinationPort;
     private int MSS;
+    private int winScale;
     private long RTO = 0;
     private long iRTT = 0;
     private int ACK_FINACK = 2;
@@ -212,9 +213,9 @@ public class TcpFlow {
 
         System.out.println("Transaction Number: " + no);
         System.out.println("SeqNo: " + srcP.getSeqNo() + " AckNo: " + srcP.getAckNo()  + " Window Size: " +
-                srcP.getWindowSize());
+                (srcP.getWindowSize() << getWinScale()));
         System.out.println("SeqNo: " + destP.getSeqNo() + " AckNo: " + destP.getAckNo()  + " Window Size: " +
-                destP.getWindowSize());
+                (destP.getWindowSize() << getWinScale()));
     }
 
     private long[] getDeltaStamps() {
@@ -269,4 +270,11 @@ public class TcpFlow {
         System.out.printf("Empirical Throughput: %.4f bps\n", empiricalThroughput());
     }
 
+    public int getWinScale() {
+        return winScale;
+    }
+
+    public void setWinScale(int winScale) {
+        this.winScale = winScale;
+    }
 }
