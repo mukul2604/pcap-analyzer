@@ -127,8 +127,6 @@ public class TcpFlow {
 
                     if (possibleDup != null) {
                         long diff = flowPacket.getTimeStamp() - possibleDup.getTimeStamp();
-
-                        TcpFlowPacket p = ackHash.get(flowPacket.getSeqNo() + val);
                         if (diff > RTO) {
                             this.reTransmit += 1;
                             dupAckHash.remove(flowPacket.getSeqNo());
@@ -242,7 +240,7 @@ public class TcpFlow {
         }
 
         for(i=0; i< srcList.size(); i++) {
-            totalData += srcList.get(i).getFrameLen();
+            totalData += srcList.get(i).getSegmentLen();
         }
 
         return  (((totalData*8.0f) / totalTime) * 1000)/1024;
@@ -272,7 +270,7 @@ public class TcpFlow {
 
         float lossRate = ((srcList.size() - ACK_FINACK - ackList.size()) * 1.0f) / srcList.size();
         System.out.printf("Sender: %d\tReceived: %d\n", srcList.size() - ACK_FINACK, ackList.size());
-        System.out.printf("Loss rate: %.4f\n", lossRate);
+        System.out.printf("Loss rate: %.3f\n", lossRate);
 
         System.out.println("Number of fast re-transmissions: " + FastRetransmit);
         System.out.println("Number of re-transmissions: " + reTransmit);

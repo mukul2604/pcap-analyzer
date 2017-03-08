@@ -13,10 +13,10 @@ public class TcpFlowPacket {
     private int dataLen;
     private int ackCount;
     private long timeStamp;
-    private int frameLen;
+    private int segmentLen;
 
     public TcpFlowPacket(int src, int dest, long seq, long ack,
-                         int dlen, int framelen, int flags, int window, long timestamp) {
+                         int dlen, int segmenlen, int flags, int window, long timestamp) {
         this.sourcePort = src;
         this.destinationPort = dest;
         this.seqNo = seq;
@@ -25,7 +25,7 @@ public class TcpFlowPacket {
         this.windowSize = window;
         this.dataLen = dlen;
         this.timeStamp = timestamp;
-        this.frameLen = framelen;
+        this.segmentLen = segmenlen;
     }
 
     public int getSourcePort() {
@@ -68,8 +68,8 @@ public class TcpFlowPacket {
         this.ackCount = ackCount;
     }
 
-    public int getFrameLen() {
-        return frameLen;
+    public int getSegmentLen() {
+        return segmentLen;
     }
 }
 
