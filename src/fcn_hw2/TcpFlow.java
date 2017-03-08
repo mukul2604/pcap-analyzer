@@ -234,16 +234,13 @@ public class TcpFlow {
         long totalTime = 0;
         long totalData = 0;
 
-        long [] arr = getDeltaStamps();
-        for (i=0; i < arr.length; i++) {
-            totalTime += arr[i];
-        }
+        totalTime = srcList.get(srcList.size()-1).getTimeStamp() - srcList.get(0).getTimeStamp();
 
         for(i=0; i< srcList.size(); i++) {
             totalData += srcList.get(i).getSegmentLen();
         }
 
-        return  (((totalData*8.0f) / totalTime) * 1000)/1024;
+        return  ((((totalData*8.0f) / totalTime) * 1000) / 1024) / 1024;
     }
 
     private float theoreticalThroughPut(float RTT) {
@@ -275,7 +272,7 @@ public class TcpFlow {
         System.out.println("Number of fast re-transmissions: " + FastRetransmit);
         System.out.println("Number of re-transmissions: " + reTransmit);
         System.out.println("Estimated rtt: " + rTTE + " msecs.");
-        System.out.printf("Empirical Throughput: %.2f Kbps\n", empiricalThroughput());
+        System.out.printf("Empirical Throughput: %.2f Mbps\n", empiricalThroughput());
         System.out.printf("Theoretical Throughput: %.2f Kbps \n", theoreticalThroughPut(rTTE));
     }
 
