@@ -141,6 +141,14 @@ public class TcpPacketParser {
             int winScale = extractWindowScale(subArr);
             flow.setWinScale(winScale);
             flow.setInitialWindowSize(windowSize);
+            // setUp ICWND
+            if (maxSegmentSize > 2190) {
+                flow.getCongestionWindows().add(2 * maxSegmentSize);
+            } else if (maxSegmentSize > 1095  && maxSegmentSize <=2190) {
+                flow.getCongestionWindows().add(3 * maxSegmentSize);
+            } else if (maxSegmentSize <= 1095) {
+                flow.getCongestionWindows().add(4 * maxSegmentSize);
+            }
         }
 
         if ((flags & SYN) == SYN && (flags & ACK) == ACK) {

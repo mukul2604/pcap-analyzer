@@ -1,23 +1,20 @@
 package fcn_hw2;
 
-
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static fcn_hw2.TcpAnalyzerMain.*;
 
-
 /**
  * Created by mukul on 3/4/17.
  */
-
 
 public class TcpFlow {
     private List <TcpFlowPacket> srcList = new ArrayList<>();
     private List <TcpFlowPacket> destList = new ArrayList<>();
     private List <TcpFlowPacket> ackList = new ArrayList<>();
     private List <Long> timeStampList = new ArrayList<>();
+    private List <Integer> congestionWindows = new ArrayList<>();
 
     private int sourcePort;
     private int destinationPort;
@@ -290,5 +287,13 @@ public class TcpFlow {
 
     public void setInitialWindowSize(int initialWindowSize) {
         this.initialWindowSize = initialWindowSize;
+    }
+
+    public List<Integer> getCongestionWindows() {
+        return congestionWindows;
+    }
+
+    public void setCongestionWindows(List<Integer> congestionWindows) {
+        this.congestionWindows = congestionWindows;
     }
 }
