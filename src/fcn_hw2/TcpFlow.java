@@ -249,14 +249,14 @@ public class TcpFlow {
     }
 
     private float theoreticalThroughPut(float RTT) {
-        float constant = 1.0f;
+        double constant = Math.sqrt(3/2);
         float lossrate = ((srcList.size() - ACK_FINACK - ackList.size()) * 1.0f) / srcList.size();
         float rhoroot = (float) Math.sqrt(lossrate);
 
         if (rhoroot == 0) {
             return ((initialWindowSize * 8000.0f) / RTT)/1024;
         } else {
-            return ((MSS * constant * 8000.0f) / (rhoroot * RTT))/1024;
+            return (float) (((MSS * constant * 8000.0f) / (rhoroot * RTT))/1024);
         }
     }
 
