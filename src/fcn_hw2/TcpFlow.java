@@ -106,10 +106,10 @@ public class TcpFlow {
             if (ackHash.containsKey(flowPacket.getSeqNo() + val)) {
                 possibleDup = ackHash.get(flowPacket.getSeqNo() + val);
                 ackHash.remove(flowPacket.getSeqNo() + val);
-                ackHash.put(flowPacket.getSeqNo() + val, flowPacket);
-            } else {
-                ackHash.put(flowPacket.getSeqNo() + val, flowPacket);
             }
+
+            ackHash.put(flowPacket.getSeqNo() + val, flowPacket);
+
            // timeStampHash.put()
             // triple dupAck, if sent packet is found in triAck hash with
             // ackVal = 3 then it means it is fast retransmitted.
@@ -150,7 +150,7 @@ public class TcpFlow {
                         ackHash.remove(key);
                     }
                 }
-                //put this ack into triple ack hash to track fast retransmission
+                //put this ack into dup ack hash to track fast retransmission
                 flowPacket.setAckCount(0);
                 dupAckHash.put(flowPacket.getAckNo(), flowPacket);
                 ackHash.remove(flowPacket.getAckNo());
