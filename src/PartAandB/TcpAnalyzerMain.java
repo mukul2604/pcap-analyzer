@@ -39,7 +39,7 @@ public class TcpAnalyzerMain {
     }
 
     public static void main(String[] args) {
-        final String FILE_NAME = "/home/cloudera/workspace/PartAandB/src/PartAandB/assignment2.pcap";
+        final String FILE_NAME = "/home/cloudera/workspace/fcn_hw2/src/PartAandB/assignment2.pcap";
         StringBuilder errBuf = new StringBuilder(); // For any error msgs
 
         Pcap pcap = Pcap.openOffline(FILE_NAME, errBuf);
