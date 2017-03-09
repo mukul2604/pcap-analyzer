@@ -17,19 +17,21 @@ public class HttpFlow {
 
     private int sourcePort;
     private int destinationPort;
+    private long timeStamp;
 
     private ConcurrentHashMap<Long, List<HttpFlowPacket>> srcAckHash = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Long, List<HttpFlowPacket>> destAckHash = new ConcurrentHashMap<>();
 
 
-    public HttpFlow (int src, int dest) {
+    public HttpFlow (int src, int dest, long timestamp) {
         this.sourcePort = src;
         this.destinationPort =dest;
+        this.timeStamp = timestamp;
     }
 
     public void push(HttpFlowPacket flowPacket) {
-        if (sourcePort != 56689 && sourcePort != 8092) return;
-        if (destinationPort != 56689 && destinationPort != 8092) return;
+//        if (sourcePort != 56689 && sourcePort != 8092) return;
+//        if (destinationPort != 56689 && destinationPort != 8092) return;
 
         if (flowPacket.getSourcePort()== sourcePort &&
             flowPacket.getDestinationPort() == destinationPort) {
@@ -161,9 +163,18 @@ public class HttpFlow {
     }
 
     public void dumpInfo() {
-        if (srcAckHash.size() !=0 )
+        if (srcAckHash.size() !=0 ) {
+            System.out.println("======================================================================================");
             dumpPacketListInfo(srcAckHash, destAckHash);
+        }
     }
 
 
+    public long getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
 }

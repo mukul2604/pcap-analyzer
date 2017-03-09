@@ -112,7 +112,7 @@ public class HttpPacketParser {
             int state = SYN;
             flowCountHash.remove(srcDestKey);
             flowCountHash.put(srcDestKey, state);
-            HttpFlow flow = new HttpFlow(sourcePort, destinationPort);
+            HttpFlow flow = new HttpFlow(sourcePort, destinationPort, timeStamp);
             httpFlowHashMap.put(srcDestKey, flow);
         }
 

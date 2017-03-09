@@ -9,8 +9,14 @@ import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.protocol.tcpip.Tcp;
 
 import java.nio.ByteBuffer;
-import java.util.HashMap;
+import java.util.*;
 
+
+class timeComparator implements Comparator<HttpFlow> {
+    public int compare(HttpFlow flow1, HttpFlow flow2) {
+        return  (int)(flow1.getTimeStamp() - flow2.getTimeStamp());
+    }
+}
 
 public class HttpAnalyzerMain {
     private static int tcpCount = 0;
@@ -22,9 +28,15 @@ public class HttpAnalyzerMain {
     public static HashMap<Integer, HttpFlow> httpFlowHashMap = new HashMap<>();
 
     public void packetFlowInfoDump() {
+        List<HttpFlow>  flowList = new ArrayList<>();
         for (Integer key: httpFlowHashMap.keySet()) {
-            System.out.println("======================================================================================");
+
             HttpFlow flow = httpFlowHashMap.get(key);
+            flowList.add(flow);
+        }
+        Collections.sort(flowList, new timeComparator());
+        for (HttpFlow flow: flowList) {
+
             flow.dumpInfo();
         }
     }
