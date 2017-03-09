@@ -58,8 +58,6 @@ public class HttpPacketParser {
     public HttpPacketParser(byte[] frame, long timeStamp, long frameNumber) {
         byte[] tcpPacketArray = Arrays.copyOfRange(frame, 34, frame.length);
         byte[] subArr;
-        tcpSentCount = 0;
-        tcpSentTotalData = 0;
         subArr = Arrays.copyOfRange(tcpPacketArray, 0, 2);
 
         this.sourcePort = byteArrayToInt(subArr);

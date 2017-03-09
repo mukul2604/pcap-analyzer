@@ -21,8 +21,10 @@ class timeComparator implements Comparator<HttpFlow> {
 public class HttpAnalyzerMain {
     private long intialTimeStamp = 0;
     private long finalTimeStamp = 0;
+    private long approxDataPerFlow = 0;
+    private  String serverPort = null;
 
-    private float protocol = 0;
+ //   private float protocol = 0;
 
     public static final int SYN = 0x002;
     public static final int ACK = 0x010;
@@ -31,6 +33,7 @@ public class HttpAnalyzerMain {
     public static final float HTTP1_0 = 1.0f;
     public static final float HTTP1_1 = 1.1f;
     public static final float HTTP2_0 = 2.0f;
+    //public static final int SINGLE_FLOW = 1;
 
     public static long tcpSentCount = 0;
     public static long tcpSentTotalData = 0;
@@ -40,7 +43,6 @@ public class HttpAnalyzerMain {
     public void packetFlowInfoDump() {
         List<HttpFlow>  flowList = new ArrayList<>();
         for (Integer key: httpFlowHashMap.keySet()) {
-
             HttpFlow flow = httpFlowHashMap.get(key);
             flowList.add(flow);
         }
@@ -60,7 +62,7 @@ public class HttpAnalyzerMain {
         return count;
     }
 
-    public void analyze(String args) {
+    public void analyze(String args, boolean dumpDetailedInfo) {
         final String FILE_NAME = args; //"/home/cloudera/workspace/fcn_hw2/src/PartC/DumpFile01_8092.pcap";
         StringBuilder errBuf = new StringBuilder();
 
@@ -95,9 +97,10 @@ public class HttpAnalyzerMain {
             }
         }
 
-        //if (protocol == 1.0f) {
+        if (dumpDetailedInfo)
             packetFlowInfoDump();
-        //}
+
+        this.approxDataPerFlow = (tcpSentTotalData / httpFlowHashMap.size());
         flush();
         pcap.close();
     }
@@ -108,5 +111,20 @@ public class HttpAnalyzerMain {
     }
     public long timeDeltaMsec() {
         return (finalTimeStamp - intialTimeStamp);
+    }
+
+
+
+
+    public long getApproxDataPerFlow() {
+        return approxDataPerFlow;
+    }
+
+    public String getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(String serverPort) {
+        this.serverPort = serverPort;
     }
 }
