@@ -35,9 +35,6 @@ public class HttpFlow {
     }
 
     public void push(HttpFlowPacket flowPacket) {
-//        if (sourcePort != 56689 && sourcePort != 8092) return;
-//        if (destinationPort != 56689 && destinationPort != 8092) return;
-
         if (flowPacket.getSourcePort()== sourcePort &&
             flowPacket.getDestinationPort() == destinationPort) {
             int val;
