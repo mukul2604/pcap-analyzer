@@ -23,7 +23,7 @@ public class HttpAnalyzerMain {
 
     public void packetFlowInfoDump() {
         for (Integer key: httpFlowHashMap.keySet()) {
-            System.out.println("=====================================================");
+            System.out.println("======================================================================================");
             HttpFlow flow = httpFlowHashMap.get(key);
             flow.dumpInfo();
         }
