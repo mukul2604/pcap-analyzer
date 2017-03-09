@@ -121,7 +121,7 @@ public class HttpFlow {
                 }
                 break;
             } else {
-                if (packet.getHttpPayload().length() > 66) {
+                if (packet.getHttpPayload().length() > 100) {
                     reassembledFrameList.add(packet);
                 }
             }
