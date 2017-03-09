@@ -58,7 +58,7 @@ public class HttpPacketParser {
 
 
 
-    public HttpPacketParser(byte [] frame, long timeStamp){
+    public HttpPacketParser(byte [] frame, long timeStamp, long frameNumber){
         byte[] tcpPacketArray = Arrays.copyOfRange(frame, 34, frame.length);
         byte[] subArr;
         subArr = Arrays.copyOfRange(tcpPacketArray,0,2);
@@ -100,7 +100,7 @@ public class HttpPacketParser {
 
 
         HttpFlowPacket fPacket = new HttpFlowPacket(sourcePort, destinationPort, seqNo,
-                                    ackNo, dataLen, segmentLen, httpData, flags, windowSize, timeStamp);
+                                    ackNo, dataLen, segmentLen, httpData, flags, windowSize, timeStamp, frameNumber);
 
 
         int srcDestKey = sourcePort*27 + destinationPort;
