@@ -18,7 +18,6 @@ public class HttpPacketParser {
     private long ackNo;
     private int flags;
     private int windowSize;
-//    private int timeStamp;
     private int dataOffset;
     private int dataLen;
     private int hdrLen;
@@ -142,34 +141,9 @@ public class HttpPacketParser {
     }
 
 
-    public void printPacket() {
-        System.out.printf("Source: %5d\tDestination: %5d\tSeqNo: %12d\tAck: %12d\tFlags: %d\tWindow Size: %d\n",
-                        sourcePort, destinationPort, seqNo, ackNo, flags, windowSize);
-    }
-//
-//    public int srcPort() {
-//        return  sourcePort;
+//    public void printPacket() {
+//        System.out.printf("Source: %5d\tDestination: %5d\tSeqNo: %12d\tAck: %12d\tFlags: %d\tWindow Size: %d\n",
+//                        sourcePort, destinationPort, seqNo, ackNo, flags, windowSize);
 //    }
-//
-//    public int destPort() {
-//        return destinationPort;
-//    }
-//
-//    public long seqNo() {
-//        return seqNo;
-//    }
-//
-//    public long ackNo() {
-//        return ackNo;
-//    }
-//
-//    public int tcpFlags() {
-//        return flags;
-//    }
-//
-//    public int windowSize() {
-//        return windowSize;
-//    }
-
 
 }

@@ -21,7 +21,7 @@ public class HttpAnalyzerMain {
     public static HashMap<Integer, Integer> flowCountHash = new HashMap<>();
     public static HashMap<Integer, HttpFlow> httpFlowHashMap = new HashMap<>();
 
-    public static void packetFlowInfoDump() {
+    public void packetFlowInfoDump() {
         for (Integer key: httpFlowHashMap.keySet()) {
             System.out.println("=====================================================");
             HttpFlow flow = httpFlowHashMap.get(key);
@@ -29,7 +29,7 @@ public class HttpAnalyzerMain {
         }
     }
 
-    public  static int flowCount() {
+    public int flowCount() {
         int count = 0;
         for(Integer key: flowCountHash.keySet()) {
             if (flowCountHash.get(key) == ACK) {
@@ -39,8 +39,8 @@ public class HttpAnalyzerMain {
         return count;
     }
 
-    public static void main(String[] args) {
-        final String FILE_NAME = "/home/cloudera/workspace/fcn_hw2/src/PartC/DumpFile01_8092.pcap";
+    public void analyze(String args) {
+        final String FILE_NAME = args; //"/home/cloudera/workspace/fcn_hw2/src/PartC/DumpFile01_8092.pcap";
         StringBuilder errBuf = new StringBuilder();
 
         Pcap pcap = Pcap.openOffline(FILE_NAME, errBuf);
