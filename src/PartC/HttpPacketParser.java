@@ -1,12 +1,10 @@
 package PartC;
 
-import PartAandB.TcpFlow;
-import PartAandB.TcpFlowPacket;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import static PartAandB.TcpAnalyzerMain.*;
+import static PartC.HttpAnalyzerMain.*;
 
 
 /**
@@ -87,14 +85,10 @@ public class HttpPacketParser {
         subArr = Arrays.copyOfRange(tcpPacketArray, 14, 16);
         this.windowSize = byteArrayToInt(subArr);
 
-//        subArr = Arrays.copyOfRange(tcpPacketArray, 20, tcpPacketArray.length);
-//        this.timeStamp = extractTimeStamp(subArr);
-
-
         int segmentLen = tcpPacketArray.length;
-        //int framelen = frame.length;
 
-        PartAandB.TcpFlowPacket fPacket = new TcpFlowPacket(sourcePort,destinationPort, seqNo,
+
+        HttpFlowPacket fPacket = new HttpFlowPacket(sourcePort,destinationPort, seqNo,
                                     ackNo, dataLen, segmentLen, flags, windowSize, timeStamp);
 
 
@@ -107,8 +101,8 @@ public class HttpPacketParser {
             int state = SYN;
             flowCountHash.remove(srcDestKey);
             flowCountHash.put(srcDestKey, state);
-            TcpFlow flow = new TcpFlow(sourcePort, destinationPort);
-            tcpFlowHashMap.put(srcDestKey, flow);
+            HttpFlow flow = new HttpFlow(sourcePort, destinationPort);
+            httpFlowHashMap.put(srcDestKey, flow);
             //subArr = Arrays.copyOfRange(tcpPacketArray, 20, tcpPacketArray.length);
 
         }
@@ -139,11 +133,11 @@ public class HttpPacketParser {
 
         //Don't confuse, it is pushing packets in same flow.
 
-        if (tcpFlowHashMap.containsKey(srcDestKey))
-            tcpFlowHashMap.get(srcDestKey).push(fPacket);
+        if (httpFlowHashMap.containsKey(srcDestKey))
+            httpFlowHashMap.get(srcDestKey).push(fPacket);
 
-        if (tcpFlowHashMap.containsKey(destSrcKey))
-            tcpFlowHashMap.get(destSrcKey).push(fPacket);
+        if (httpFlowHashMap.containsKey(destSrcKey))
+            httpFlowHashMap.get(destSrcKey).push(fPacket);
 
     }
 
@@ -152,30 +146,30 @@ public class HttpPacketParser {
         System.out.printf("Source: %5d\tDestination: %5d\tSeqNo: %12d\tAck: %12d\tFlags: %d\tWindow Size: %d\n",
                         sourcePort, destinationPort, seqNo, ackNo, flags, windowSize);
     }
-
-    public int srcPort() {
-        return  sourcePort;
-    }
-
-    public int destPort() {
-        return destinationPort;
-    }
-
-    public long seqNo() {
-        return seqNo;
-    }
-
-    public long ackNo() {
-        return ackNo;
-    }
-
-    public int tcpFlags() {
-        return flags;
-    }
-
-    public int windowSize() {
-        return windowSize;
-    }
+//
+//    public int srcPort() {
+//        return  sourcePort;
+//    }
+//
+//    public int destPort() {
+//        return destinationPort;
+//    }
+//
+//    public long seqNo() {
+//        return seqNo;
+//    }
+//
+//    public long ackNo() {
+//        return ackNo;
+//    }
+//
+//    public int tcpFlags() {
+//        return flags;
+//    }
+//
+//    public int windowSize() {
+//        return windowSize;
+//    }
 
 
 }

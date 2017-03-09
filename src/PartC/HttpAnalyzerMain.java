@@ -16,7 +16,7 @@ public class HttpAnalyzerMain {
     private static int tcpCount = 0;
     public static final int SYN = 0x002;
     public static final int ACK = 0x010;
-    public static final float alpha = 0.875f;
+//    public static final float alpha = 0.875f;
 
     public static HashMap<Integer, Integer> flowCountHash = new HashMap<>();
     public static HashMap<Integer, HttpFlow> httpFlowHashMap = new HashMap<>();
@@ -67,7 +67,7 @@ public class HttpAnalyzerMain {
                 packet.transferTo(frameBuffer);
                 long tsmsecs = packet.getCaptureHeader().timestampInMillis();
                 HttpPacketParser httpPacketParser = new HttpPacketParser(frameBuffer.array(), tsmsecs);
-                httpPacketParser.ackNo();
+//                httpPacketParser.ackNo();
             }
 
         }

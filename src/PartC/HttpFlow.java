@@ -2,12 +2,8 @@ package PartC;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static PartC.HttpAnalyzerMain.alpha;
-
 
 /**
  * Created by mukul on 3/4/17.
@@ -18,58 +14,18 @@ public class HttpFlow {
     private List <HttpFlowPacket> destList = new ArrayList<>();
     private List <HttpFlowPacket> ackList = new ArrayList<>();
     private List <Long> timeStampList = new ArrayList<>();
-    private List <Integer> congestionWindows = new ArrayList<>();
-
     private int sourcePort;
     private int destinationPort;
-    private int MSS;
-    private int winScale;
-    private long RTO = 0;
-    private long iRTT = 0;
-    private int ACK_FINACK = 2;
-    private int initialWindowSize;
+
 
 
     private ConcurrentHashMap<Long, HttpFlowPacket> ackHash = new ConcurrentHashMap<>();
     private HashMap<Long, HttpFlowPacket> dupAckHash = new HashMap<>();
-   // private HashMap<Integer, Float> timeStampHash = new HashMap<>();
 
-    protected int FastRetransmit = 0;
-    protected int reTransmit = 0;
 
     public HttpFlow (int src, int dest) {
         this.sourcePort = src;
         this.destinationPort =dest;
-    }
-
-    private long [] listToArrayLong(List list) {
-        long[] ret = new long[list.size()];
-        Iterator<Long> iter  = list.iterator();
-        for (int i=0; iter.hasNext(); i++) {
-            ret[i] = iter.next();
-        }
-        return ret;
-    }
-
-    private long [] deltaArray(long []  arr) {
-        int i;
-        List<Long> temp = new ArrayList();
-        for (i = 0 ; i < arr.length-3; i+=2) {
-            temp.add(arr[i+1] - arr[i]);
-        }
-        return listToArrayLong(temp);
-    }
-
-    private float RTT(float  oldRtt, long newSample) {
-        return (alpha * oldRtt + (1 - alpha) * newSample);
-    }
-
-    private float estimateRTT(long [] deltaArr) {
-        float oldRtt = deltaArr[0];
-        for (int i = 1; i < deltaArr.length-1; i++) {
-            oldRtt = RTT(oldRtt, deltaArr[i]);
-        }
-        return oldRtt;
     }
 
     public void push(HttpFlowPacket flowPacket) {
@@ -99,24 +55,6 @@ public class HttpFlow {
             // ackVal = 3 then it means it is fast retransmitted.
             if (dupAckHash.containsKey(flowPacket.getSeqNo())) {
                 HttpFlowPacket dupPacket = dupAckHash.get(flowPacket.getSeqNo());
-                int ackVal = dupPacket.getAckCount();
-                if (ackVal == TRIPLE_DUP_ACK) {
-                    dupAckHash.remove(flowPacket.getSeqNo());
-                    this.FastRetransmit += 1;
-                } else {
-                    if (this.iRTT == 0) {
-                        this.iRTT = srcList.get(1).getTimeStamp() - srcList.get(0).getTimeStamp();
-                        this.RTO = 2 * this.iRTT;
-                    }
-
-                    if (possibleDup != null) {
-                        long diff = flowPacket.getTimeStamp() - possibleDup.getTimeStamp();
-                        if (diff > RTO) {
-                            this.reTransmit += 1;
-                            dupAckHash.remove(flowPacket.getSeqNo());
-                        }
-                    }
-                }
             }
         } else if (flowPacket.getDestinationPort() == sourcePort &&
                    flowPacket.getSourcePort() == destinationPort) {
@@ -151,13 +89,6 @@ public class HttpFlow {
         }
     }
 
-    public void setMSS(int MSS) {
-        this.MSS = MSS;
-    }
-
-    public int getMSS(int MSS) {
-        return MSS;
-    }
 
     public List getSrcList() {
         return  srcList;
@@ -188,99 +119,10 @@ public class HttpFlow {
     }
 
 
-    private void printTransactions(int no) {
-        int srcBase = 1;
-        int destBase = 0;
-        HttpFlowPacket srcP = srcList.get(no+srcBase);
-        HttpFlowPacket destP = destList.get(no+destBase);
-
-        System.out.println("Transaction Number: " + no);
-        System.out.println("SeqNo: " + srcP.getSeqNo() + " AckNo: " + srcP.getAckNo()  + " Window Size: " +
-                (srcP.getWindowSize() << getWinScale()));
-        System.out.println("SeqNo: " + destP.getSeqNo() + " AckNo: " + destP.getAckNo()  + " Window Size: " +
-                (destP.getWindowSize() << getWinScale()));
-    }
-
-    private long[] getDeltaStamps() {
-        List timeStampList = getTimeStampList();
-        long[] timeStamps = listToArrayLong(timeStampList);
-        long[] deltaStamps = deltaArray(timeStamps);
-        return deltaStamps;
-    }
-
-    private float getEstimatedRtt() {
-        // Get Estimated RTT
-        return estimateRTT(getDeltaStamps());
-    }
-
-    private float empiricalThroughput() {
-        int i;
-        long totalTime;
-        long totalData = 0;
-
-        totalTime = srcList.get(srcList.size()-1).getTimeStamp() - srcList.get(0).getTimeStamp();
-
-        for(i=0; i< srcList.size(); i++) {
-            totalData += srcList.get(i).getSegmentLen();
-        }
-
-        return  ((((totalData*8.0f) / totalTime) * 1000) / 1024) / 1024;
-    }
-
-    private float theoreticalThroughPut(float RTT) {
-        double constant = Math.sqrt(3/2);
-        float lossRate = ((srcList.size() - ACK_FINACK - ackList.size()) * 1.0f) / srcList.size();
-        float rhoRoot = (float) Math.sqrt(lossRate);
-
-        if (rhoRoot == 0) {
-            return ((initialWindowSize * 8000.0f) / RTT)/1024;
-        } else {
-            return (float) (((MSS * constant * 8000.0f) / (rhoRoot * RTT))/1024);
-        }
-    }
 
     public void dumpInfo() {
-        float rTTE = getEstimatedRtt();
 
-        System.out.println("Source Port: " + sourcePort + " Destination Port: " +
-                destinationPort);
-
-        for (int i = 1; i <= 2; i++) {
-            printTransactions(i);
-        }
-
-        float lossRate = ((srcList.size() - ACK_FINACK - ackList.size()) * 1.0f) / srcList.size();
-        System.out.printf("Sender: %d\tReceived: %d\n", srcList.size() - ACK_FINACK, ackList.size());
-        System.out.printf("Loss rate: %.3f\n", lossRate);
-
-        System.out.println("Number of fast re-transmissions: " + FastRetransmit);
-        System.out.println("Number of re-transmissions: " + reTransmit);
-        System.out.println("Estimated rtt: " + rTTE + " msecs.");
-        System.out.printf("Empirical Throughput: %.2f Mbps\n", empiricalThroughput());
-        System.out.printf("Theoretical Throughput: %.2f Kbps \n", theoreticalThroughPut(rTTE));
     }
 
-    public int getWinScale() {
-        return winScale;
-    }
 
-    public void setWinScale(int winScale) {
-        this.winScale = winScale;
-    }
-
-    public int getInitialWindowSize() {
-        return initialWindowSize;
-    }
-
-    public void setInitialWindowSize(int initialWindowSize) {
-        this.initialWindowSize = initialWindowSize;
-    }
-
-    public List<Integer> getCongestionWindows() {
-        return congestionWindows;
-    }
-
-    public void setCongestionWindows(List<Integer> congestionWindows) {
-        this.congestionWindows = congestionWindows;
-    }
 }
