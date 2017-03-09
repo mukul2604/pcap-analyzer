@@ -31,7 +31,7 @@ public class HttpFlow {
             } else {
                 val = flowPacket.getDataLen();
             }
-
+            
             if (srcAckHash.containsKey(flowPacket.getSeqNo() + val)) {
                 srcAckHash.get(flowPacket.getSeqNo() + val).add(flowPacket);
             } else {
@@ -86,32 +86,53 @@ public class HttpFlow {
         }
     }
 
-    private void dumpPacketListInfo(ConcurrentHashMap<Long, List<HttpFlowPacket>> packetHash) {
-        List <Long> keyList = new ArrayList<>();
-        for(Long key: packetHash.keySet()) {
-            keyList.add(key);
+    private void dumpPacketListInfo(ConcurrentHashMap<Long, List<HttpFlowPacket>> srcAckHash,
+                                    ConcurrentHashMap<Long, List<HttpFlowPacket>> destAckHash) {
+        List <Long> srcKeyList = new ArrayList<>();
+        List <Long> destKeyList = new ArrayList<>();
+
+        for(Long key: srcAckHash.keySet()) {
+            srcKeyList.add(key);
         }
 
-        Collections.sort(keyList);
+        for(Long key: destAckHash.keySet()) {
+            destKeyList.add(key);
+        }
 
-        for (Long key : keyList) {
+        Collections.sort(srcKeyList);
+        Collections.sort(destKeyList);
+
+        for (Long key : srcKeyList) {
             List<HttpFlowPacket> srcList =  srcAckHash.get(key);
-            List<HttpFlowPacket> destList =  destAckHash.get(key);
-           // Collections.sort(srcList,;
+            // Collections.sort(srcList,;
             int i = 0;
             while (i < srcList.size()){
                 HttpFlowPacket srcPacket = srcList.get(i);
-                HttpFlowPacket destPacket = destList.get(i);
                 printPacketInfo(srcPacket);
-                printPacketInfo(destPacket);
                 i++;
             }
         }
 
+        for (Long key : destKeyList) {
+            List<HttpFlowPacket> destList =  destAckHash.get(key);
+            // Collections.sort(srcList,;
+            int i = 0;
+            try {
+            while (i < destList.size()){
+                HttpFlowPacket destPacket = destList.get(i);
+                printPacketInfo(destPacket);
+                i++;
+            }}  catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
+
     }
 
     public void dumpInfo() {
-        dumpPacketListInfo(srcAckHash);
+        dumpPacketListInfo(srcAckHash, destAckHash);
     }
 
 
