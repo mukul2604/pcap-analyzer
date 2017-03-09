@@ -105,8 +105,6 @@ public class HttpAnalyzerMain {
     public static void flush() {
         httpFlowHashMap.clear();
         flowCountHash.clear();
-        tcpSentCount = 0;
-        tcpSentTotalData = 0;
     }
     public long timeDeltaMsec() {
         return (finalTimeStamp - intialTimeStamp);
