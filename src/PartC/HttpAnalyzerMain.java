@@ -72,7 +72,7 @@ public class HttpAnalyzerMain {
 
         }
 
-        System.out.println("TCP Flow Count: "+flowCount());
+
         packetFlowInfoDump();
         System.out.printf("Number of tcp Packets:%d\n", tcpCount);
         pcap.close();
