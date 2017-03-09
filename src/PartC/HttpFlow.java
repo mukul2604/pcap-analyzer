@@ -72,10 +72,6 @@ public class HttpFlow {
         String temp[] = packet.getHttpPayload().split("\r\n");
         for (String str : temp) {
             if (str.contains("HTTP")) {
-                System.out.println("Source: " + packet.getSourcePort() + " Destination: " +
-                        packet.getDestinationPort() +
-                        " SeqNo: " + packet.getSeqNo() + " AckNo: " + packet.getAckNo() + " Timestamp:  "
-                        + packet.getTimeStamp());
                 System.out.println("HTTP Request: " + str);
                 break;
             }
@@ -91,7 +87,7 @@ public class HttpFlow {
             printPacketInfo(destAckHash.get(destKeyList.get(0)).get(0));
             printPacketInfo(srcAckHash.get(srcKeyList.get(1)).get(0));
             srcKeyList.remove(0);
-            srcKeyList.remove(1);
+            srcKeyList.remove(0);
             destKeyList.remove(0);
             synack = true;
         }
