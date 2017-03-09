@@ -1,6 +1,7 @@
 package PartC;
 
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -86,14 +87,19 @@ public class HttpPacketParser {
 
         int segmentLen = tcpPacketArray.length;
 
+        String httpData = null;
         if (dataLen > 0) {
-            subArr = Arrays.copyOfRange(tcpPacketArray, hdrLen, dataLen);
-        } else {
-            subArr = null;
+            try {
+                subArr = Arrays.copyOfRange(tcpPacketArray, hdrLen, hdrLen + dataLen);
+                httpData = new String(subArr, "UTF-8");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        byte [] httpData = subArr;
-        HttpFlowPacket fPacket = new HttpFlowPacket(sourcePort,destinationPort, seqNo,
+
+
+        HttpFlowPacket fPacket = new HttpFlowPacket(sourcePort, destinationPort, seqNo,
                                     ackNo, dataLen, segmentLen, httpData, flags, windowSize, timeStamp);
 
 
@@ -108,8 +114,6 @@ public class HttpPacketParser {
             flowCountHash.put(srcDestKey, state);
             HttpFlow flow = new HttpFlow(sourcePort, destinationPort);
             httpFlowHashMap.put(srcDestKey, flow);
-            //subArr = Arrays.copyOfRange(tcpPacketArray, 20, tcpPacketArray.length);
-
         }
 
         if ((flags & SYN) == SYN && (flags & ACK) == ACK) {

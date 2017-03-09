@@ -14,10 +14,10 @@ public class HttpFlowPacket {
     private int ackCount;
     private long timeStamp;
     private int segmentLen;
-    private byte[] httpPayload;
+    private String httpPayload;
 
     public HttpFlowPacket(int src, int dest, long seq, long ack,
-                          int dlen, int segmentlen, byte[] data, int flags, int window, long timestamp) {
+                          int dlen, int segmentlen, String data, int flags, int window, long timestamp) {
         this.sourcePort = src;
         this.destinationPort = dest;
         this.seqNo = seq;
@@ -72,6 +72,14 @@ public class HttpFlowPacket {
 
     public int getSegmentLen() {
         return segmentLen;
+    }
+
+    public String getHttpPayload() {
+        return httpPayload;
+    }
+
+    public void setHttpPayload(String httpPayload) {
+        this.httpPayload = httpPayload;
     }
 }
 

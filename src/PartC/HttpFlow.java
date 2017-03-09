@@ -118,10 +118,26 @@ public class HttpFlow {
         return timeStampList;
     }
 
+    private void dumpPacketListInfo(List<HttpFlowPacket> packetList) {
+        for(HttpFlowPacket packet: packetList) {
+            if (packet.getHttpPayload() == null) continue;
+            String temp [] = packet.getHttpPayload().split("\r\n");
+            for (String str: temp) {
+                if (str.contains("HTTP")){
+                    System.out.println("Source: " + packet.getSourcePort() + " Destination:" + packet.getDestinationPort());
+                    System.out.println("SeqNo: " + packet.getSeqNo() + " AckNo: " + packet.getAckNo());
+                    System.out.println("HTTP Request: " + str);
+                    break;
+                }
+            }
+        }
 
+    }
 
     public void dumpInfo() {
-
+        dumpPacketListInfo(srcList);
+        System.out.println("------------------------------------");
+        dumpPacketListInfo(destList);
     }
 
 
