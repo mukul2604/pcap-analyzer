@@ -1,7 +1,5 @@
 package PartC;
 
-
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -22,26 +20,26 @@ public class HttpPacketParser {
     private int dataOffset;
     private int dataLen;
     private int hdrLen;
+    private int segmentLen;
 
 
-
-    public static int byteArrayToInt(byte [] b) {
-        StringBuilder sb = new StringBuilder(2* b.length);
-        for(byte elem: b) {
-            sb.append(String.format("%02x",elem));
+    public static int byteArrayToInt(byte[] b) {
+        StringBuilder sb = new StringBuilder(2 * b.length);
+        for (byte elem : b) {
+            sb.append(String.format("%02x", elem));
         }
 
-        BigInteger val = new BigInteger(sb.toString(),16);
+        BigInteger val = new BigInteger(sb.toString(), 16);
         return val.intValue();
     }
 
-    public static long byteArrayToLong(byte [] b) {
-        StringBuilder sb = new StringBuilder(2* b.length);
-        for(byte elem: b) {
-            sb.append(String.format("%02x",elem));
+    public static long byteArrayToLong(byte[] b) {
+        StringBuilder sb = new StringBuilder(2 * b.length);
+        for (byte elem : b) {
+            sb.append(String.format("%02x", elem));
         }
 
-        BigInteger val = new BigInteger(sb.toString(),16);
+        BigInteger val = new BigInteger(sb.toString(), 16);
         return val.longValue();
     }
 
@@ -57,24 +55,23 @@ public class HttpPacketParser {
     }
 
 
-
-    public HttpPacketParser(byte [] frame, long timeStamp, long frameNumber){
+    public HttpPacketParser(byte[] frame, long timeStamp, long frameNumber) {
         byte[] tcpPacketArray = Arrays.copyOfRange(frame, 34, frame.length);
         byte[] subArr;
-        subArr = Arrays.copyOfRange(tcpPacketArray,0,2);
+        subArr = Arrays.copyOfRange(tcpPacketArray, 0, 2);
 
         this.sourcePort = byteArrayToInt(subArr);
 
-        subArr = Arrays.copyOfRange(tcpPacketArray,2,4);
+        subArr = Arrays.copyOfRange(tcpPacketArray, 2, 4);
         this.destinationPort = byteArrayToInt(subArr);
 
-        subArr = Arrays.copyOfRange(tcpPacketArray,4,8);
+        subArr = Arrays.copyOfRange(tcpPacketArray, 4, 8);
         this.seqNo = byteArrayToLong(subArr);
 
-        subArr = Arrays.copyOfRange(tcpPacketArray,8,12);
+        subArr = Arrays.copyOfRange(tcpPacketArray, 8, 12);
         this.ackNo = byteArrayToLong(subArr);
 
-        subArr = Arrays.copyOfRange(tcpPacketArray, 12,14);
+        subArr = Arrays.copyOfRange(tcpPacketArray, 12, 14);
         this.flags = extractFlags(subArr);
 
         this.dataOffset = extractDataOffset(tcpPacketArray[12]);
@@ -85,7 +82,7 @@ public class HttpPacketParser {
         subArr = Arrays.copyOfRange(tcpPacketArray, 14, 16);
         this.windowSize = byteArrayToInt(subArr);
 
-        int segmentLen = tcpPacketArray.length;
+        this.segmentLen = tcpPacketArray.length;
 
         String httpData = null;
         if (dataLen > 0) {
@@ -98,13 +95,12 @@ public class HttpPacketParser {
         }
 
 
-
         HttpFlowPacket fPacket = new HttpFlowPacket(sourcePort, destinationPort, seqNo,
-                                    ackNo, dataLen, segmentLen, httpData, flags, windowSize, timeStamp, frameNumber);
+                ackNo, dataLen, segmentLen, httpData, flags, windowSize, timeStamp, frameNumber);
 
 
-        int srcDestKey = sourcePort*27 + destinationPort;
-        int destSrcKey = destinationPort*27 + sourcePort;
+        int srcDestKey = sourcePort * 27 + destinationPort;
+        int destSrcKey = destinationPort * 27 + sourcePort;
 
 
         //FLOW COUNT evaluation
@@ -117,11 +113,10 @@ public class HttpPacketParser {
         }
 
         if ((flags & SYN) == SYN && (flags & ACK) == ACK) {
-
             if (flowCountHash.containsKey(destSrcKey)) {
                 int state = flowCountHash.get(destSrcKey);
                 if (state == SYN) {
-                    state = SYN|ACK;
+                    state = SYN | ACK;
                     flowCountHash.remove(destSrcKey);
                     flowCountHash.put(destSrcKey, state);
                 }
@@ -129,9 +124,9 @@ public class HttpPacketParser {
         }
 
         if ((flags & SYN) != SYN && (flags & ACK) == ACK) {
-           if (flowCountHash.containsKey(srcDestKey)) {
+            if (flowCountHash.containsKey(srcDestKey)) {
                 int state = flowCountHash.get(srcDestKey);
-                if (state == (SYN|ACK)) {
+                if (state == (SYN | ACK)) {
                     state = ACK;
                     flowCountHash.remove(srcDestKey);
                     flowCountHash.put(srcDestKey, state);
@@ -145,15 +140,11 @@ public class HttpPacketParser {
         if (httpFlowHashMap.containsKey(srcDestKey))
             httpFlowHashMap.get(srcDestKey).push(fPacket);
 
-        if (httpFlowHashMap.containsKey(destSrcKey))
+        if (httpFlowHashMap.containsKey(destSrcKey)) {
             httpFlowHashMap.get(destSrcKey).push(fPacket);
+            tcpSentCount += 1;
+            tcpSentTotalData += fPacket.getSegmentLen();
+        }
 
     }
-
-
-//    public void printPacket() {
-//        System.out.printf("Source: %5d\tDestination: %5d\tSeqNo: %12d\tAck: %12d\tFlags: %d\tWindow Size: %d\n",
-//                        sourcePort, destinationPort, seqNo, ackNo, flags, windowSize);
-//    }
-
 }

@@ -19,13 +19,21 @@ class timeComparator implements Comparator<HttpFlow> {
 }
 
 public class HttpAnalyzerMain {
-    private static int tcpCount = 0;
+    private long intialTimeStamp = 0;
+    private long finalTimeStamp = 0;
+
+    private float protocol = 0;
+
     public static final int SYN = 0x002;
     public static final int ACK = 0x010;
     public static final int PUSH = 0x008;
     public static final int FIN = 0x001;
-//    public static final float alpha = 0.875f;
+    public static final float HTTP1_0 = 1.0f;
+    public static final float HTTP1_1 = 1.1f;
+    public static final float HTTP2_0 = 2.0f;
 
+    public static long tcpSentCount = 0;
+    public static long tcpSentTotalData = 0;
     public static HashMap<Integer, Integer> flowCountHash = new HashMap<>();
     public static HashMap<Integer, HttpFlow> httpFlowHashMap = new HashMap<>();
 
@@ -38,7 +46,6 @@ public class HttpAnalyzerMain {
         }
         Collections.sort(flowList, new timeComparator());
         for (HttpFlow flow: flowList) {
-
             flow.dumpInfo();
         }
     }
@@ -76,20 +83,32 @@ public class HttpAnalyzerMain {
             PcapPacket packet = new PcapPacket(hdr, buf);
             packet.scan(id);
             if (packet.hasHeader(tcp)) {
-                tcpCount++;
                 ByteBuffer frameBuffer = ByteBuffer.allocate(packet.size());
                 packet.transferTo(frameBuffer);
                 long frameNumber = packet.getFrameNumber();
                 long tsmsecs = packet.getCaptureHeader().timestampInMillis();
+                if(this.intialTimeStamp == 0) {
+                    this.intialTimeStamp = tsmsecs;
+                }
                 HttpPacketParser httpPacketParser = new HttpPacketParser(frameBuffer.array(), tsmsecs, frameNumber);
-//                httpPacketParser.ackNo();
+                finalTimeStamp = tsmsecs;
             }
-
         }
 
-
-        packetFlowInfoDump();
-        System.out.printf("Number of tcp Packets:%d\n", tcpCount);
+        //if (protocol == 1.0f) {
+            packetFlowInfoDump();
+        //}
+        flush();
         pcap.close();
+    }
+
+    public static void flush() {
+        httpFlowHashMap.clear();
+        flowCountHash.clear();
+        tcpSentCount = 0;
+        tcpSentTotalData = 0;
+    }
+    public long timeDeltaMsec() {
+        return (finalTimeStamp - intialTimeStamp);
     }
 }

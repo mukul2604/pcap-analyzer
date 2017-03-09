@@ -73,6 +73,8 @@ public class TcpAnalyzerMain {
 
         System.out.println("TCP Flow Count: "+flowCount());
         packetFlowInfoDump();
+        flowCountHash.clear();
+        tcpFlowHashMap.clear();
         System.out.printf("Number of tcp Packets:%d\n", tcpCount);
         pcap.close();
     }
