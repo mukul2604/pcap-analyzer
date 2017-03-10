@@ -22,7 +22,7 @@ public class TcpAnalyzerMain {
 
     public static void packetFlowInfoDump() {
         for (Integer key: tcpFlowHashMap.keySet()) {
-            System.out.println("=====================================================");
+            System.out.println("===================================================================================");
             TcpFlow flow = tcpFlowHashMap.get(key);
             flow.dumpInfo();
         }
@@ -75,7 +75,7 @@ public class TcpAnalyzerMain {
         packetFlowInfoDump();
         flowCountHash.clear();
         tcpFlowHashMap.clear();
-        System.out.printf("Number of tcp Packets:%d\n", tcpCount);
+       // System.out.printf("Number of tcp Packets:%d\n", tcpCount);
         pcap.close();
     }
 }

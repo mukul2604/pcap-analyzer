@@ -24,6 +24,8 @@ public class TcpFlow {
     private long iRTT = 0;
     private int ACK_FINACK = 2;
     private int initialWindowSize;
+    private int currentCongestionWindow = 0;
+    private int ssThresold =  Integer.MAX_VALUE;
 
 
     private ConcurrentHashMap<Long, TcpFlowPacket> ackHash = new ConcurrentHashMap<>();
@@ -88,6 +90,8 @@ public class TcpFlow {
     public void push(TcpFlowPacket flowPacket) {
         int TRIPLE_DUP_ACK = 3;
         TcpFlowPacket possibleDup = null;
+        if (currentCongestionWindow == 0)
+            currentCongestionWindow = congestionWindows.get(0);
         
         if (flowPacket.getSourcePort()== sourcePort &&
             flowPacket.getDestinationPort() == destinationPort) {
@@ -127,6 +131,11 @@ public class TcpFlow {
                         if (diff > RTO) {
                             this.reTransmit += 1;
                             dupAckHash.remove(flowPacket.getSeqNo());
+                            if(congestionWindows.size() < 5) {
+                                currentCongestionWindow = congestionWindows.get(0);
+                                ssThresold = currentCongestionWindow / 2;
+                                congestionWindows.add(currentCongestionWindow);
+                            }
                         }
                     }
                 }
@@ -151,6 +160,16 @@ public class TcpFlow {
                 flowPacket.setAckCount(0);
                 dupAckHash.put(flowPacket.getAckNo(), flowPacket);
                 ackHash.remove(flowPacket.getAckNo());
+
+                //congestion window code.
+                if (congestionWindows.size() < 5) {
+                    if ( currentCongestionWindow < ssThresold) {
+                        currentCongestionWindow = 2 * currentCongestionWindow;
+                        congestionWindows.add(currentCongestionWindow);
+                    } else {
+                        currentCongestionWindow = currentCongestionWindow + 1;
+                    }
+                }
             }
 
             if (dupAckHash.containsKey(flowPacket.getAckNo())) {
@@ -263,14 +282,20 @@ public class TcpFlow {
         }
 
         float lossRate = ((srcList.size() - ACK_FINACK - ackList.size()) * 1.0f) / srcList.size();
-        System.out.printf("Sender: %d\tReceived: %d\n", srcList.size() - ACK_FINACK, ackList.size());
-        System.out.printf("Loss rate: %.3f\n", lossRate);
 
-        System.out.println("Number of fast re-transmissions: " + FastRetransmit);
-        System.out.println("Number of re-transmissions: " + reTransmit);
+        System.out.printf("Loss rate: %.3f\n", lossRate);
         System.out.println("Estimated rtt: " + rTTE + " msecs.");
         System.out.printf("Empirical Throughput: %.2f Mbps\n", empiricalThroughput());
         System.out.printf("Theoretical Throughput: %.2f Kbps \n", theoreticalThroughPut(rTTE));
+
+        System.out.printf("Initial Congestion Window size: %d bytes\n", congestionWindows.get(0));
+        System.out.printf("First five Congestion window sizes in bytes: ");
+        for(int i = 0 ; i < congestionWindows.size();i ++) {
+            System.out.printf("%d ", congestionWindows.get(i));
+        }
+        System.out.printf("\n");
+        System.out.println("Number of fast re-transmissions: " + FastRetransmit);
+        System.out.println("Number of re-transmissions: " + reTransmit);
     }
 
     public int getWinScale() {
